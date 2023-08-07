@@ -57,10 +57,8 @@ require('packer').startup(function(use)
   use 'tpope/vim-rhubarb'
   use 'lewis6991/gitsigns.nvim'
 
-  --use 'navarasu/onedark.nvim' -- Theme inspired by Atom
-  --use 'folke/tokyonight.nvim'
-
   use 'folke/tokyonight.nvim'
+  use 'NLKNguyen/papercolor-theme'
 
   use 'nvim-lualine/lualine.nvim'           -- Fancier statusline
   use 'lukas-reineke/indent-blankline.nvim' -- Add indentation guides even on blank lines
@@ -86,6 +84,9 @@ require('packer').startup(function(use)
   use 'ThePrimeagen/vim-be-good'
 
   use 'mbbill/undotree'
+
+  -- Easymotion
+  use 'easymotion/vim-easymotion'
 
   -- Add custom plugins to packer from ~/.config/nvim/lua/custom/plugins.lua
   local has_plugins, plugins = pcall(require, 'custom.plugins')
@@ -183,7 +184,7 @@ require("tokyonight").setup({
 
 -- Set colorscheme
 vim.o.termguicolors = true
---vim.cmd [[colorscheme onedark]]
+
 vim.cmd('colorscheme tokyonight')
 
 -- Set completeopt to have a better completion experience
@@ -205,6 +206,21 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 local options = { noremap = true, silent = true }
+
+-- Easymotion
+vim.api.nvim_set_keymap('', '<Leader>', '<Plug>(easymotion-prefix)', options)
+vim.api.nvim_set_keymap('n', '<Leader>h', '<Plug>(easymotion-linebackward)', options)
+vim.api.nvim_set_keymap('n', '<Leader>j', '<Plug>(easymotion-j)', options)
+vim.api.nvim_set_keymap('n', '<Leader>k', '<Plug>(easymotion-k)', options)
+vim.api.nvim_set_keymap('n', '<Leader>l', '<Plug>(easymotion-lineforward)', options)
+
+vim.api.nvim_set_keymap('', '<Leader>f', '<Plug>(easymotion-bd-f)', options)
+vim.api.nvim_set_keymap('n', '<Leader>f','<Plug>(easymotion-overwin-f)', options)
+--vim.api.nvim_set_keymap('n', 's', '<Plug>(easymotion-overwin-f2)', options)
+vim.api.nvim_set_keymap('', '<Leader>L','<Plug>(easymotion-bd-jk)', options)
+vim.api.nvim_set_keymap('n', '<Leader>L','<Plug>(easymotion-overwin-line)', options)
+vim.api.nvim_set_keymap('', '<Leader>w', '<Plug>(easymotion-bd-w)', options)
+vim.api.nvim_set_keymap('n', '<Leader>w','<Plug>(easymotion-overwin-w)', options)
 
 --Change panes on vim ctrl mappings
 vim.api.nvim_set_keymap('n', '<C-h>', '<C-w>h', options)
@@ -240,7 +256,7 @@ vim.api.nvim_set_keymap("n", "<leader>D", '"_D', options)
 vim.api.nvim_set_keymap("n", "<leader>D", '"_D', options)
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "K", ":m -2<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '>-2<CR>gv=gv")
 
 vim.keymap.set("n", "J", "mzJ`z")
 vim.keymap.set("n", "Q", "<nop>")
@@ -436,7 +452,7 @@ local function on_attach(bufnr)
   vim.keymap.set('n', '<C-k>', api.node.show_info_popup, opts('Info'))
   vim.keymap.set('n', '<C-r>', api.fs.rename_sub, opts('Rename: Omit Filename'))
   vim.keymap.set('n', '<C-t>', api.node.open.tab, opts('Open: New Tab'))
-  vim.keymap.set('n', '<C-v>', api.node.open.vertical, opts('Open: Vertical Split'))
+  vim.keymap.set('n', '<C-s>', api.node.open.vertical, opts('Open: Vertical Split'))
   vim.keymap.set('n', '<C-x>', api.node.open.horizontal, opts('Open: Horizontal Split'))
   vim.keymap.set('n', '<BS>', api.node.navigate.parent_close, opts('Close Directory'))
   vim.keymap.set('n', '<CR>', api.node.open.edit, opts('Open'))
