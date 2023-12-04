@@ -1,5 +1,5 @@
 [alias]
-	lg = log --graph --oneline --decorate
+	lg = log --graph --oneline --decorate --all
 	s = status
 	cm = commit -m
 	co = checkout
@@ -7,3 +7,6 @@
 	defaultBranch = main
 [include]
 	path = ~/.gitconfig.local
+[user]
+	email = jostein.lysberg@gmail.com
+	name = JLysberg

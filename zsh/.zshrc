@@ -1,8 +1,24 @@
+# xclip hack
+export DISPLAY=":0"
+
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 
+# Add binaries to path
+export PATH="$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/misc/cli_tools/dashlane-cli/bundle"
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
+
+# directory aliases
+hash -d web=~/dev/osirion/apps/web/
+hash -d frf=~/dev/osirion/services/fn_replay_fetcher
+hash -d fpc=~/dev/osirion/services/fn_parsing_client
+hash -d tf=~/dev/osirion/services/terraform
+hash -d api=~/dev/osirion/services/api
+
+# boilerplate:
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -119,13 +135,13 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 
-export DISPLAY="$(grep '^nameserver ' /etc/resolv.conf | cut -d' ' -f2):0"
+# export DISPLAY="$(grep '^nameserver ' /etc/resolv.conf | cut -d' ' -f2):0"
 export BROWSER="wslview"
 
 export LESS=-FRX
 
 # pnpm
-export PNPM_HOME="/home/hfp/.local/share/pnpm"
+export PNPM_HOME="/home/norlys/.local/share/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;

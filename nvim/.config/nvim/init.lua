@@ -8,7 +8,6 @@ if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
   vim.fn.system { 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path }
   vim.cmd [[packadd packer.nvim]]
 end
-
 require('packer').startup(function(use)
   -- Package manager
   use 'wbthomason/packer.nvim'
@@ -57,9 +56,11 @@ require('packer').startup(function(use)
   use 'tpope/vim-rhubarb'
   use 'lewis6991/gitsigns.nvim'
 
+  -- Color schemes
   use 'folke/tokyonight.nvim'
-  use 'NLKNguyen/papercolor-theme'
+  use "EdenEast/nightfox.nvim"
 
+  -- Statusline and Bufferline
   use 'nvim-lualine/lualine.nvim'           -- Fancier statusline
   use 'lukas-reineke/indent-blankline.nvim' -- Add indentation guides even on blank lines
   use 'numToStr/Comment.nvim'               -- "gc" to comment visual regions/lines
@@ -69,6 +70,9 @@ require('packer').startup(function(use)
 
   -- Fuzzy Finder Algorithm which requires local dependencies to be built. Only load if `make` is available
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+  
+  -- Ripgrep for Telescope
+  use { 'BurntSushi/ripgrep' }
 
   --C# and Razor Support
   --use 'OrangeT/vim-csharp'
@@ -83,10 +87,11 @@ require('packer').startup(function(use)
   --ThePrimeagen Vim Tutorial Minigame
   use 'ThePrimeagen/vim-be-good'
 
+  --Undotree
   use 'mbbill/undotree'
 
-  -- Easymotion
-  use 'easymotion/vim-easymotion'
+  -- Term edit
+  use { 'chomosuke/term-edit.nvim', tag = 'v1.*' }
 
   -- Add custom plugins to packer from ~/.config/nvim/lua/custom/plugins.lua
   local has_plugins, plugins = pcall(require, 'custom.plugins')
@@ -124,7 +129,7 @@ vim.api.nvim_create_autocmd('BufWritePost', {
 -- See `:help vim.o`
 
 -- Set highlight on search
-vim.o.hlsearch = false
+vim.o.hlsearch = true
 
 -- Make line numbers default
 vim.wo.number = true
@@ -149,7 +154,7 @@ vim.wo.signcolumn = 'yes'
 require("tokyonight").setup({
   -- your configuration comes here
   -- or leave it empty to use the default settings
-  style = "storm",        -- The theme comes in three styles, `storm`, `moon`, a darker variant `night` and `day`
+  style = "moon",        -- The theme comes in three styles, `storm`, `moon`, a darker variant `night` and `day`
   light_style = "storm",  -- The theme is used when the background is set to light
   transparent = false,    -- Enable this to disable setting the background color
   terminal_colors = true, -- Configure the colors used when opening a `:terminal` in Neovim
@@ -167,7 +172,7 @@ require("tokyonight").setup({
   sidebars = { "qf", "help" },      -- Set a darker background on sidebar-like windows. For example: `["qf", "vista_kind", "terminal", "packer"]`
   day_brightness = 0.3,             -- Adjusts the brightness of the colors of the **Day** style. Number between 0 and 1, from dull to vibrant colors
   hide_inactive_statusline = false, -- Enabling this option, will hide inactive statuslines and replace them with a thin border instead. Should work with the standard **StatusLine** and **LuaLine**.
-  dim_inactive = false,             -- dims inactive windows
+  dim_inactive = true,             -- dims inactive windows
   lualine_bold = false,             -- When `true`, section headers in the lualine theme will be bold
 
   --- You can override specific color groups to use other groups or a hex color
@@ -181,11 +186,56 @@ require("tokyonight").setup({
   ---@param colors ColorScheme
   on_highlights = function(highlights, colors) end,
 })
+-- vim.cmd('colorscheme tokyonight')
 
 -- Set colorscheme
-vim.o.termguicolors = true
+-- vim.o.termguicolors = true
 
-vim.cmd('colorscheme tokyonight')
+-- Default options
+require('nightfox').setup({
+  options = {
+    -- Compiled file's destination location
+    compile_path = vim.fn.stdpath("cache") .. "/nightfox",
+    compile_file_suffix = "_compiled", -- Compiled file suffix
+    transparent = false,     -- Disable setting background
+    terminal_colors = true,  -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
+    dim_inactive = true,    -- Non focused panes set to alternative background
+    module_default = true,   -- Default enable value for modules
+    colorblind = {
+      enable = false,        -- Enable colorblind support
+      simulate_only = false, -- Only show simulated colorblind colors and not diff shifted
+      severity = {
+        protan = 0,          -- Severity [0,1] for protan (red)
+        deutan = 0,          -- Severity [0,1] for deutan (green)
+        tritan = 0,          -- Severity [0,1] for tritan (blue)
+      },
+    },
+    styles = {               -- Style to be applied to different syntax groups
+      comments = "italic",     -- Value is any valid attr-list value `:help attr-list`
+      conditionals = "NONE",
+      constants = "NONE",
+      functions = "NONE",
+      keywords = "NONE",
+      numbers = "NONE",
+      operators = "NONE",
+      strings = "NONE",
+      types = "NONE",
+      variables = "NONE",
+    },
+    inverse = {             -- Inverse highlight for different types
+      match_paren = false,
+      visual = false,
+      search = false,
+    },
+    modules = {             -- List of various plugins and additional options
+      -- ...
+    },
+  },
+  palettes = {},
+  specs = {},
+  groups = {},
+})
+vim.cmd("colorscheme nightfox")
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
@@ -202,38 +252,43 @@ vim.g.maplocalleader = ' '
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Remap for dealing with word wrap
-vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+vim.keymap.set('n', '<Up>', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+vim.keymap.set('n', '<Down>', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 local options = { noremap = true, silent = true }
 
--- Easymotion
-vim.api.nvim_set_keymap('', '<Leader>', '<Plug>(easymotion-prefix)', options)
-vim.api.nvim_set_keymap('n', '<Leader>h', '<Plug>(easymotion-linebackward)', options)
-vim.api.nvim_set_keymap('n', '<Leader>j', '<Plug>(easymotion-j)', options)
-vim.api.nvim_set_keymap('n', '<Leader>k', '<Plug>(easymotion-k)', options)
-vim.api.nvim_set_keymap('n', '<Leader>l', '<Plug>(easymotion-lineforward)', options)
+vim.api.nvim_set_keymap('n', '<Leader>c', '<cmd>noh<cr>', options)
 
-vim.api.nvim_set_keymap('', '<Leader>f', '<Plug>(easymotion-bd-f)', options)
-vim.api.nvim_set_keymap('n', '<Leader>f','<Plug>(easymotion-overwin-f)', options)
---vim.api.nvim_set_keymap('n', 's', '<Plug>(easymotion-overwin-f2)', options)
-vim.api.nvim_set_keymap('', '<Leader>L','<Plug>(easymotion-bd-jk)', options)
-vim.api.nvim_set_keymap('n', '<Leader>L','<Plug>(easymotion-overwin-line)', options)
-vim.api.nvim_set_keymap('', '<Leader>w', '<Plug>(easymotion-bd-w)', options)
-vim.api.nvim_set_keymap('n', '<Leader>w','<Plug>(easymotion-overwin-w)', options)
+-- Easymotion
+vim.g.EasyMotion_keys = 'aoeuh,.pgcr;qjkmwvzyixfdbltns'
+-- vim.api.nvim_set_keymap('', '<Leader>', '<Plug>(easymotion-prefix)', options)
+-- vim.api.nvim_set_keymap('', 'f', '<Plug>(easymotion-f)', options)
+-- vim.api.nvim_set_keymap('', 'F', '<Plug>(easymotion-F)', options)
+-- vim.api.nvim_set_keymap('', 't', '<Plug>(easymotion-t)', options)
+-- vim.api.nvim_set_keymap('', 'T', '<Plug>(easymotion-F)', options)
 
 --Change panes on vim ctrl mappings
-vim.api.nvim_set_keymap('n', '<C-h>', '<C-w>h', options)
-vim.api.nvim_set_keymap('n', '<C-j>', '<C-w>j', options)
-vim.api.nvim_set_keymap('n', '<C-k>', '<C-w>k', options)
-vim.api.nvim_set_keymap('n', '<C-l>', '<C-w>l', options)
+vim.api.nvim_set_keymap('n', '<leader><Left>', '<C-w>h', options)
+vim.api.nvim_set_keymap('n', '<leader><Down>', '<C-w>j', options)
+vim.api.nvim_set_keymap('n', '<leader><Up>', '<C-w>k', options)
+vim.api.nvim_set_keymap('n', '<leader><Right>', '<C-w>l', options)
+-- vim.api.nvim_set_keymap('t', '<leader><Left>', '<C-\\><C-o><C-w>h', options)
+-- vim.api.nvim_set_keymap('t', '<leader><Down>', '<C-\\><C-o><C-w>j', options)
+-- vim.api.nvim_set_keymap('t', '<leader><Up>', '<C-\\><C-o><C-w>k', options)
+-- vim.api.nvim_set_keymap('t', '<leader><Right>', '<C-\\><C-o><C-w>l', options)
+vim.api.nvim_set_keymap("n", "=", [[<cmd>vertical resize +5<cr>]], options) -- make the window biger vertically
+vim.api.nvim_set_keymap("n", "-", [[<cmd>vertical resize -5<cr>]], options) -- make the window smaller vertically
+vim.api.nvim_set_keymap("n", "+", [[<cmd>horizontal resize +2<cr>]], options) -- make the window bigger horizontally by pressing shift and =
+vim.api.nvim_set_keymap("n", "_", [[<cmd>horizontal resize -2<cr>]], options) -- make the window smaller horizontally by pressing shift and -
+
 
 --Escape maps to a rolling jk
-vim.api.nvim_set_keymap('i', 'jk', '<ESC>', options)
+-- vim.api.nvim_set_keymap('i', 'jk', '<ESC>', options)
 
 --Navigate in Nvim Tree
-vim.api.nvim_set_keymap('n', 'fee', '<cmd>NvimTreeToggle<cr>', options)
-vim.api.nvim_set_keymap('n', 'fer', '<cmd>NvimTreeRefresh<cr>', options)
+vim.api.nvim_set_keymap('n', '<leader>th', '<cmd>NvimTreeFocus<cr>', options)
+vim.api.nvim_set_keymap('n', '<leader>tt', '<cmd>NvimTreeToggle<cr>', options)
+-- vim.api.nvim_set_keymap('n', '<leader>tr', '<cmd>NvimTreeRefresh<cr>', options)
 
 --Primeagen Motions
 vim.api.nvim_set_keymap('n', '<C-d>', '<C-d>zz', options)
@@ -241,41 +296,55 @@ vim.api.nvim_set_keymap('n', '<C-u>', '<C-u>zz', options)
 vim.api.nvim_set_keymap('n', 'n', 'nzzzv', options)
 vim.api.nvim_set_keymap('n', 'N', 'Nzzzv', options)
 
+-- Tab/untab selected line / block of text in visual mode
 vim.api.nvim_set_keymap("v", "<", "<gv", options)
 vim.api.nvim_set_keymap("v", ">", ">gv", options)
-vim.api.nvim_set_keymap("x", "<leader>p", '"_dP', options)
 
+-- Yank to clipboard
 vim.api.nvim_set_keymap("n", "<leader>y", '"+y', options)
 vim.api.nvim_set_keymap("v", "<leader>y", '"+y', options)
 vim.api.nvim_set_keymap("n", "<leader>Y", '"+Y', options)
 
+-- Yank file path to clipboard
+vim.api.nvim_set_keymap("n", "<leader>yp", ':let @+=expand("%:p")<CR>', options)
+
+-- Paste from clipboard
+vim.api.nvim_set_keymap("x", "<leader>p", '"+p', options)
+
+-- Delete to black hole register
 vim.api.nvim_set_keymap("n", "<leader>d", '"_d', options)
 vim.api.nvim_set_keymap("v", "<leader>d", '"_d', options)
 vim.api.nvim_set_keymap("n", "<leader>D", '"_D', options)
+vim.api.nvim_set_keymap("v", "<leader>D", '"_D', options)
 
-vim.api.nvim_set_keymap("n", "<leader>D", '"_D', options)
-
+-- Move selected line / block of text in visual mode	
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '>-2<CR>gv=gv")
 
+-- Move current line / block with Alt-j/k ala vscode.
 vim.keymap.set("n", "J", "mzJ`z")
 vim.keymap.set("n", "Q", "<nop>")
 
+-- Toggle undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
+-- Rename current word in buffer
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 vim.keymap.set("n", "<leader>vip", "<cmd>e ~/.config/nvim/init.lua<CR>");
 
 --Primeagen Harpoon
 local mark = require("harpoon.mark")
 local ui = require("harpoon.ui")
-
-vim.keymap.set("n", "<leader>h", mark.toggle_file)
+-- local term = require("harpoon.term")
+vim.keymap.set("n", "<leader>m", mark.toggle_file)
 vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
-
-vim.keymap.set("n", "<C-t>", function() ui.nav_file(1) end)
-vim.keymap.set("n", "<C-n>", function() ui.nav_file(2) end)
-vim.keymap.set("n", "<C-s>", function() ui.nav_file(3) end)
+-- vim.keymap.set("n", "<C-o>", ui.nav_next)
+-- vim.keymap.set("n", "<C-a>", ui.nav_prev)
+vim.keymap.set("n", "<C-h>", function() ui.nav_file(1) end)
+vim.keymap.set("n", "<C-t>", function() ui.nav_file(2) end)
+vim.keymap.set("n", "<C-n>", function() ui.nav_file(3) end)
+vim.keymap.set("n", "<C-s>", function() ui.nav_file(4) end)
+-- vim.keymap.set("t", "<C-t>", function() term.gotoTerminal(1) end)
 
 --Primeagen fugitive
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
@@ -284,9 +353,12 @@ local ThePrimeagen_Fugitive = vim.api.nvim_create_augroup("ThePrimeagen_Fugitive
 
 --Term escape and panes
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
-vim.keymap.set("n", "<leader>vp", "<cmd>vsplit<cr>")
-vim.keymap.set("n", "<leader>vs", "<cmd>split<cr>")
-vim.keymap.set("n", "<leader>vt", "<cmd>vsplit<cr><cmd>ter<cr>i")
+-- vim.keymap.set("n", "<leader>vp", "<cmd>vsplit<cr>")
+-- vim.keymap.set("n", "<leader>vs", "<cmd>split<cr>")
+vim.keymap.set("n", "<leader>nww", "<cmd>vne<cr>")
+vim.keymap.set("n", "<leader>nw", "<cmd>new<cr>")
+vim.keymap.set("n", "<leader>nt", "<cmd>split<cr><cmd>ter<cr>i")
+vim.keymap.set("n", "<leader>ntt", "<cmd>vsplit<cr><cmd>ter<cr>i")
 
 local autocmd = vim.api.nvim_create_autocmd
 autocmd("BufWinEnter", {
@@ -321,7 +393,6 @@ autocmd("BufWinEnter", {
 
 vim.o.relativenumber = true
 vim.o.nu = true
-vim.o.hlsearch = false
 vim.o.incsearch = true
 vim.o.hidden = true
 vim.o.errorbells = false
@@ -337,9 +408,10 @@ vim.o.mouse = "a"
 vim.o.tabstop = 4
 vim.o.softtabstop = 0
 vim.o.shiftwidth = 4
-vim.o.expandtab = false
+vim.o.expandtab = true
 vim.o.smartindent = true
 vim.o.autoread = true
+vim.o.smarttab = true
 
 vim.o.ignorecase = true
 vim.o.smartcase = true
@@ -414,10 +486,10 @@ require('Comment').setup()
 
 -- Enable `lukas-reineke/indent-blankline.nvim`
 -- See `:help indent_blankline.txt`
-require('indent_blankline').setup {
-  char = '┊',
-  show_trailing_blankline_indent = false,
-}
+-- require('indent_blankline').setup {
+--   -- char = '┊',
+--   -- show_trailing_blankline_indent = false,
+-- }
 
 -- Gitsigns
 -- See `:help gitsigns.txt`
@@ -452,7 +524,7 @@ local function on_attach(bufnr)
   vim.keymap.set('n', '<C-k>', api.node.show_info_popup, opts('Info'))
   vim.keymap.set('n', '<C-r>', api.fs.rename_sub, opts('Rename: Omit Filename'))
   vim.keymap.set('n', '<C-t>', api.node.open.tab, opts('Open: New Tab'))
-  vim.keymap.set('n', '<C-s>', api.node.open.vertical, opts('Open: Vertical Split'))
+  vim.keymap.set('n', '<C-v>', api.node.open.vertical, opts('Open: Vertical Split'))
   vim.keymap.set('n', '<C-x>', api.node.open.horizontal, opts('Open: Horizontal Split'))
   vim.keymap.set('n', '<BS>', api.node.navigate.parent_close, opts('Close Directory'))
   vim.keymap.set('n', '<CR>', api.node.open.edit, opts('Open'))
@@ -464,7 +536,7 @@ local function on_attach(bufnr)
   vim.keymap.set('n', 'a', api.fs.create, opts('Create'))
   vim.keymap.set('n', 'bmv', api.marks.bulk.move, opts('Move Bookmarked'))
   vim.keymap.set('n', 'B', api.tree.toggle_no_buffer_filter, opts('Toggle No Buffer'))
-  vim.keymap.set('n', 'c', api.fs.copy.node, opts('Copy'))
+  vim.keymap.set('n', 'y', api.fs.copy.node, opts('Yank File'))
   vim.keymap.set('n', 'C', api.tree.toggle_git_clean_filter, opts('Toggle Git Clean'))
   vim.keymap.set('n', '[c', api.node.navigate.git.prev, opts('Prev Git'))
   vim.keymap.set('n', ']c', api.node.navigate.git.next, opts('Next Git'))
@@ -495,7 +567,7 @@ local function on_attach(bufnr)
   vim.keymap.set('n', 'U', api.tree.toggle_custom_filter, opts('Toggle Hidden'))
   vim.keymap.set('n', 'W', api.tree.collapse_all, opts('Collapse'))
   vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
-  vim.keymap.set('n', 'y', api.fs.copy.filename, opts('Copy Name'))
+  vim.keymap.set('n', 'yn', api.fs.copy.filename, opts('Yank File Name'))
   vim.keymap.set('n', 'Y', api.fs.copy.relative_path, opts('Copy Relative Path'))
   vim.keymap.set('n', '<2-LeftMouse>', api.node.open.edit, opts('Open'))
   vim.keymap.set('n', '<2-RightMouse>', api.tree.change_root_to_node, opts('CD'))
@@ -579,12 +651,16 @@ vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 require('telescope').setup {
   defaults = {
     mappings = {
-      i = {
-        ['<C-u>'] = false,
-        ['C-d>'] = false,
+      n = {
+        ['<s-d>'] = require('telescope.actions').delete_buffer
       },
+      i = {
+        ["<C-h>"] = "which_key",
+        ['<s-d>'] = require('telescope.actions').delete_buffer,
+        -- ['<C-u>'] = false
+      }
     },
-  },
+  }
 }
 
 -- Enable telescope fzf native, if installed
@@ -593,7 +669,7 @@ pcall(require("telescope").load_extension, 'harpoon')
 
 -- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
+vim.keymap.set('n', '<leader><leader>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
   -- You can pass additional configuration to telescope to change theme, layout, etc.
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -711,7 +787,7 @@ on_attach = function(_, bufnr)
   nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
   -- See `:help K` for why this keymap
-  nmap('H', vim.lsp.buf.hover, 'Hover Documentation')
+  nmap('<leader>h', vim.lsp.buf.hover, 'Hover Documentation')
   nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
@@ -745,6 +821,31 @@ local servers = {
       telemetry = { enable = false },
     },
   },
+
+  pylsp = {
+    plugins = {
+      jedi_completion = {
+        include_params = true,
+      },
+      rope_completion = {
+        enabled = true
+      }
+    },
+  }
+
+  -- pylsp = {
+  --   plugins = {
+  --     jedi_completion = { 
+  --       enabled = true,
+  --       fuzzy = true,
+  --       eager = true,
+  --       include_params = true,
+  --       include_class_objects = true,
+  --       include_function_objects = true,
+  --     },
+  --   },
+  -- },
+
 }
 
 -- Setup neovim lua configuration
@@ -818,6 +919,69 @@ cmp.setup {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
   },
+}
+
+-- Setup term edit
+require 'term-edit'.setup {
+    -- Mandatory option:
+    -- Set this to a lua pattern that would match the end of your prompt.
+    -- Or a table of multiple lua patterns where at least one would match the
+    -- end of your prompt at any given time.
+    -- For most bash/zsh user this is '%$ '.
+    -- For most powershell/fish user this is '> '.
+    -- For most windows cmd user this is '>'.
+    prompt_end = '❯',
+    -- How to write lua patterns: https://www.lua.org/pil/20.2.html
+	
+    -- Setting this true will enable printing debug information with print()
+    debug = false,
+
+    -- Number of event loops it takes for <Left>, <Right> or <BS> keys to change
+    -- the cursor's position.
+    -- If term-edit.nvim is unreliable, increasing this value could help.
+    -- Decreasing this value can increase the responsiveness of term-edit.nvim
+    feedkeys_delay = 10,
+
+    -- Use case 1: I want to press 'o' instead of 'i' to enter insert.
+    --   `mapping = { n --[[normal mode]] = { i = 'o' } }`
+    --   `vim.keymap.set('n', 'o', 'i', { remap = true })` will achieve the same
+    --   thing. (won't work without remap = true)
+    -- Use case 2: I want to map 'c' to 'd' and 'd' to 'c'
+    --   (keymap with remap is no longer an option)
+    --   `mapping = { n = { c = 'd', d = 'c' } }` (will also map 'cc' to 'dd'
+    --   and 'dd' to 'cc')
+    -- Use case 3: I already mapped s to something else and do not want
+    --   term-edit.nvim to override my mapping.
+    --   `mapping = { n = { s = false } }`
+    --
+    -- For more examples and detailed explaination, see :h term-edit.mapping
+    mapping = {
+        -- mode = {
+        --     lhs = new_lhs
+        -- }
+    },
+
+    -- If this function returns true, term-edit.nvim will use up and down arrow
+    -- to move the cursor as well as left and right arrow.
+    -- It will be called before terminal mode is entered and the cursor is moved.
+    use_up_down_arrows = function()
+        return false
+        -- -- In certain environment, left and right arrows can not move the
+        -- -- cursor to the previous or next line, but up and down arrows can,
+        -- -- one example is ipython.
+        -- -- Below is an example that works for ipython
+        --
+        -- -- get content for line under cursor
+        -- local line = vim.fn.getline(vim.fn.line '.')
+        -- if line:find(']:', 1, true) or line:find('...:', 1, true) then
+        --   return true
+        -- else
+        --   return false
+        -- end
+    end,
+
+    -- Used to detect the start of the command
+    -- prompt_end = no default, this is mandatory
 }
 
 -- vim.opt.shell = '"C:/Program Files/Git/bin/bash.exe"'

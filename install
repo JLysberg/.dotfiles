@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-STOW_FOLDERS="zsh,bash,nvim,gitconfig,gh,starship"
+STOW_FOLDERS="zsh,bash,nvim,gitconfig,gh,starship,shai"
 
 DOT_FILES=$HOME/.dotfiles
 
@@ -10,4 +10,4 @@ do
     stow -D $folder
     stow $folder
 done
-popd
+ popd

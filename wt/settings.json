@@ -1,160 +1,26 @@
 {
+    "launchMode": "focus",
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
     "actions": 
     [
         {
-            "command": "find",
-            "keys": "ctrl+shift+f"
-        },
-        {
-            "command": 
-            {
-                "action": "resizePane",
-                "direction": "left"
-            },
-            "keys": "alt+shift+h"
-        },
-        {
-            "command": 
-            {
-                "action": "scrollDown"
-            },
-            "keys": "ctrl+shift+j"
-        },
-        {
-            "command": 
-            {
-                "action": "resizePane",
-                "direction": "down"
-            },
-            "keys": "alt+shift+j"
-        },
-        {
-            "command": 
-            {
-                "action": "copy",
-                "singleLine": false
-            },
-            "keys": "ctrl+c"
-        },
-        {
-            "command": 
-            {
-                "action": "moveFocus",
-                "direction": "down"
-            },
-            "keys": "alt+j"
-        },
-        {
-            "command": 
-            {
-                "action": "resizePane",
-                "direction": "up"
-            },
-            "keys": "alt+shift+k"
-        },
-        {
-            "command": "paste",
-            "keys": "ctrl+v"
-        },
-        {
             "command": "unbound",
-            "keys": "alt+down"
-        },
-        {
-            "command": "unbound",
-            "keys": "alt+left"
-        },
-        {
-            "command": "unbound",
-            "keys": "alt+right"
-        },
-        {
-            "command": "unbound",
-            "keys": "alt+up"
-        },
-        {
-            "command": "unbound",
-            "keys": "alt+shift+down"
-        },
-        {
-            "command": "unbound",
-            "keys": "alt+shift+left"
-        },
-        {
-            "command": "unbound",
-            "keys": "alt+shift+right"
-        },
-        {
-            "command": "unbound",
-            "keys": "alt+shift+up"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+shift+down"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+shift+up"
-        },
-        {
-            "command": 
-            {
-                "action": "splitPane",
-                "split": "auto",
-                "splitMode": "duplicate"
-            },
-            "keys": "alt+shift+d"
-        },
-        {
-            "command": 
-            {
-                "action": "scrollUp"
-            },
-            "keys": "ctrl+shift+k"
-        },
-        {
-            "command": 
-            {
-                "action": "moveFocus",
-                "direction": "left"
-            },
-            "keys": "alt+h"
-        },
-        {
-            "command": 
-            {
-                "action": "resizePane",
-                "direction": "right"
-            },
-            "keys": "alt+shift+l"
-        },
-        {
-            "command": 
-            {
-                "action": "moveFocus",
-                "direction": "right"
-            },
-            "keys": "alt+l"
-        },
-        {
-            "command": 
-            {
-                "action": "moveFocus",
-                "direction": "up"
-            },
-            "keys": "alt+k"
+            "keys": "ctrl+shift+6"
         }
     ],
     "alwaysShowNotificationIcon": false,
+    "centerOnLaunch": true,
+    "confirmCloseAllTabs": false,
     "copyFormatting": "none",
     "copyOnSelect": true,
     "defaultProfile": "{51855cb2-8cce-5362-8f54-464b92b32386}",
+    "disableAnimations": true,
     "firstWindowPreference": "persistedWindowLayout",
-    "focusFollowMouse": true,
-    "initialCols": 112,
-    "launchMode": "default",
+    "focusFollowMouse": false,
+    "initialCols": 250,
+    "initialPosition": ",",
+    "initialRows": 60,
     "newTabMenu": 
     [
         {
@@ -167,90 +33,44 @@
         "list": 
         [
             {
-                "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "hidden": false,
-                "name": "Windows PowerShell",
-                "opacity": 90
-            },
-            {
-                "commandline": "%SystemRoot%\\System32\\cmd.exe",
-                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "hidden": false,
-                "name": "Command Prompt"
-            },
-            {
-                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-                "hidden": false,
-                "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure"
-            },
-            {
-                "guid": "{d910ae2a-a2fe-550c-beb9-1da9f6992c89}",
-                "hidden": false,
-                "name": "Developer Command Prompt for VS 2022",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "guid": "{c81a5bb8-e260-53bd-8000-bfc403ecee4b}",
-                "hidden": false,
-                "name": "Developer PowerShell for VS 2022",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "backgroundImage": null,
-                "experimental.retroTerminalEffect": false,
-                "font": 
-                {
-                    "face": "CodeNewRoman NFM"
-                },
-                "guid": "{2ece5bfe-50ed-5f3a-ab87-5cd4baafed2b}",
-                "hidden": false,
-                "name": "Git Bash",
-                "opacity": 90,
-                "source": "Git"
-            },
-            {
-                "guid": "{16208362-94fc-5b1f-a491-5b2624d5ab56}",
-                "hidden": true,
-                "name": "Visual Studio Debug Console",
-                "source": "VSDebugConsole"
-            },
-            {
-                "guid": "{03ce647a-b1b6-5528-b016-02efdbb56790}",
-                "hidden": true,
-                "name": "Developer Command Prompt for VS 2019",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "guid": "{8b156250-01e3-5596-b986-c07f1894d727}",
-                "hidden": true,
-                "name": "Developer PowerShell for VS 2019",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "commandline": "C:\\Windows\\System32\\wsl.exe",
-                "guid": "{6e105f5f-a87e-4af7-8715-2f2106bb3ab5}",
-                "hidden": false,
-                "name": "wsl"
-            },
-            {
-                "colorScheme": "One Half Dark",
-                "experimental.retroTerminalEffect": false,
+                "colorScheme": "nightfox",
                 "font": 
                 {
                     "face": "FiraCode Nerd Font",
                     "size": 10.0
                 },
                 "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
-                "hidden": false,
-                "intenseTextStyle": "bright",
+                "hidden": true,
                 "name": "Ubuntu",
                 "opacity": 95,
-                "padding": "10",
-                "scrollbarState": "visible",
+                "padding": "0",
                 "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc",
-                "useAcrylic": false
+                "tabTitle": "wsl"
+            },
+            {
+                "colorScheme": "nightfox",
+                "font": 
+                {
+                    "face": "FiraCode Nerd Font",
+                    "size": 10.0
+                },
+                "guid": "{2ece5bfe-50ed-5f3a-ab87-5cd4baafed2b}",
+                "hidden": false,
+                "name": "Git Bash",
+                "opacity": 95,
+                "source": "Git"
+            },
+            {
+                "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell"
+            },
+            {
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "Command Prompt"
             }
         ]
     },
@@ -479,29 +299,6 @@
             "cyan": "#3A96DD",
             "foreground": "#FFFFFF",
             "green": "#26A269",
-            "name": "Ubuntu-22.04-ColorScheme",
-            "purple": "#881798",
-            "red": "#C21A23",
-            "selectionBackground": "#FFFFFF",
-            "white": "#CCCCCC",
-            "yellow": "#A2734C"
-        },
-        {
-            "background": "#300A24",
-            "black": "#171421",
-            "blue": "#0037DA",
-            "brightBlack": "#767676",
-            "brightBlue": "#08458F",
-            "brightCyan": "#2C9FB3",
-            "brightGreen": "#26A269",
-            "brightPurple": "#A347BA",
-            "brightRed": "#C01C28",
-            "brightWhite": "#F2F2F2",
-            "brightYellow": "#A2734C",
-            "cursorColor": "#FFFFFF",
-            "cyan": "#3A96DD",
-            "foreground": "#FFFFFF",
-            "green": "#26A269",
             "name": "Ubuntu-ColorScheme",
             "purple": "#881798",
             "red": "#C21A23",
@@ -531,9 +328,33 @@
             "selectionBackground": "#FFFFFF",
             "white": "#C0C0C0",
             "yellow": "#808000"
+        },
+        {
+            "background": "#192330",
+            "black": "#393B44",
+            "blue": "#719CD6",
+            "brightBlack": "#575860",
+            "brightBlue": "#86ABDC",
+            "brightCyan": "#7AD5D6",
+            "brightGreen": "#8EBAA4",
+            "brightPurple": "#BAA1E2",
+            "brightRed": "#D16983",
+            "brightWhite": "#E4E4E5",
+            "brightYellow": "#E0C989",
+            "cursorColor": "#CDCECF",
+            "cyan": "#63CDCF",
+            "foreground": "#CDCECF",
+            "green": "#81B29A",
+            "name": "nightfox",
+            "purple": "#9D79D6",
+            "red": "#C94F6D",
+            "selectionBackground": "#2B3B51",
+            "white": "#DFDFE0",
+            "yellow": "#DBC074"
         }
     ],
     "startOnUserLogin": true,
+    "theme": "system",
     "themes": 
     [
         {
