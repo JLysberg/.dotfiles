@@ -17,6 +17,11 @@ hash -d frf=~/dev/osirion/services/fn_replay_fetcher
 hash -d fpc=~/dev/osirion/services/fn_parsing_client
 hash -d tf=~/dev/osirion/services/terraform
 hash -d api=~/dev/osirion/services/api
+hash -d ai=~/dev/osirion/services/ai
+hash -d os=~/dev/osirion
+
+# aliases
+alias nvo="nvim ~os"
 
 # boilerplate:
 
