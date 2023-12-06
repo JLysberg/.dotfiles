@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-STOW_FOLDERS="zsh,bash,nvim,gitconfig,gh,starship,shai"
+STOW_FOLDERS="zsh,bash,nvim,gitconfig,gh,starship"
 
 DOT_FILES=$HOME/.dotfiles
 
