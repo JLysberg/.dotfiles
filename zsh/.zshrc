@@ -7,9 +7,13 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 # Add binaries to path
 export PATH="$PATH:$HOME/.local/bin"
 export PATH="$PATH:$HOME/misc/cli_tools/dashlane-cli/bundle"
+export PATH="$PATH:/usr/local/go/bin"
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
+
+# Add .NET Core SDK tools
+export PATH="$PATH:/home/norlys/.dotnet/tools"
 
 # directory aliases
 hash -d web=~/dev/osirion/apps/web/
