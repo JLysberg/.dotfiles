@@ -18,9 +18,9 @@
     "disableAnimations": true,
     "firstWindowPreference": "persistedWindowLayout",
     "focusFollowMouse": false,
-    "initialCols": 250,
+    "initialCols": 150,
     "initialPosition": ",",
-    "initialRows": 60,
+    "initialRows": 40,
     "newTabMenu": 
     [
         {

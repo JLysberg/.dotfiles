@@ -26,6 +26,7 @@ hash -d os=~/dev/osirion
 
 # aliases
 alias nvo="nvim ~os"
+alias nvt="nvim ~ +term"
 
 # boilerplate:
 

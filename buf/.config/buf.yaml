@@ -1,0 +1,13 @@
+version: v1
+lint:
+  # refer to: https://buf.build/docs/lint/rules
+  except:
+    - MINIMAL
+    - SERVICE_SUFFIX
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
+    - RPC_REQUEST_RESPONSE_UNIQUE
+  enum_zero_value_suffix: _UNSPECIFIED
+  rpc_allow_google_protobuf_empty_requests: true
+  rpc_allow_google_protobuf_empty_responses: true
+
