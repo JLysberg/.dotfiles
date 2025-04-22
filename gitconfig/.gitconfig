@@ -1,12 +1,27 @@
 [alias]
-	lg = log --graph --oneline --decorate --all
-	s = status
-	cm = commit -m
-	co = checkout
+  lg = log --graph --oneline --decorate --all
+  s = status
+  cm = commit -m
+  co = checkout
+  d = diff
+  ds = diff --staged
+  dw = diff --word-diff
+  dws = diff --staged --word-diff
 [init]
-	defaultBranch = main
+  defaultBranch = main
 [include]
-	path = ~/.gitconfig.local
+  path = ~/.gitconfig.local
 [user]
-	email = jostein.lysberg@gmail.com
-	name = JLysberg
+  email = jostein.lysberg@gmail.com
+  name = JLysberg
+[rerere]
+	enabled = true
+[column]
+	ui = auto
+[branch]
+	sort = committerdate
+[maintenance]
+  repo = /home/norlys/.dotfiles
+	repo = /home/norlys/dev/osirion
+[core]
+  pager = less --tabs 4
