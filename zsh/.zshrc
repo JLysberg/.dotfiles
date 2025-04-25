@@ -179,5 +179,5 @@ eval "$(pyenv init -)"
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-# export environment variables
-source .env
+# Add nvim to path
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
