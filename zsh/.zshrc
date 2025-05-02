@@ -1,21 +1,14 @@
 # xclip hack
 export DISPLAY=":0"
 
-# If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:$PATH
+# wsl gui support
+# export DISPLAY="$(grep '^nameserver ' /etc/resolv.conf | cut -d' ' -f2):0"
+export BROWSER="wslview"
 
-# Add binaries to path
-export PATH="$PATH:$HOME/.local/bin"
-export PATH="$PATH:$HOME/misc/cli_tools/dashlane-cli/bundle"
-export PATH="$PATH:/usr/local/go/bin"
-
-# Path to your oh-my-zsh installation.
+# Path to oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Add .NET Core SDK tools
-export PATH="$PATH:/home/norlys/.dotnet/tools"
-
-# directory aliases
+# Directory aliases
 hash -d web=~/dev/osirion/apps/web/
 hash -d frf=~/dev/osirion/services/fn_replay_fetcher
 hash -d fpc=~/dev/osirion/services/fn_parsing_client
@@ -28,15 +21,33 @@ hash -d os=~/dev/osirion
 hash -d kinch=~/dev/osirion/apps/kinch-bot
 hash -d ftp=~/dev/osirion/services/fn_tournament_postprocessor
 
-# aliases
+# Command aliases
 alias nvo="nvim ~os"
 alias nvot="nvim ~/dev/_temp/osirion"
 alias nvt="nvim ~ +term"
-
 alias k="kubectl"
 alias kcc="kubectl config current-context"
 
+# Add binaries to path
+export PATH="$PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/misc/cli_tools/dashlane-cli/bundle"
+export PATH="$PATH:/usr/local/go/bin"
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+export PATH="$PATH:/usr/local/bin/npm"
+export PATH="$PATH:/usr/lib/python3"
+
+# Add volta to path
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME:$PATH"
+
+# Add .NET Core SDK tools
+export PATH="$PATH:/home/norlys/.dotnet/tools"
+
+# --------------------------------------------------
 # boilerplate:
+
+# If you come from bash you might have to change your $PATH.
+export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -140,21 +151,14 @@ alias xl="exa -lga --icons"
 # for git bare repo dotfile management, currently not using
 # alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
-# ----------------
+# --------------------------------------------------
+# Generated
 
 # starship config
 eval "$(starship init zsh)"
 
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
-
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-
-# export DISPLAY="$(grep '^nameserver ' /etc/resolv.conf | cut -d' ' -f2):0"
-export BROWSER="wslview"
 
 export LESS=-FRX
 
@@ -171,13 +175,6 @@ complete -o nospace -C /usr/bin/terraform terraform
 
 eval "$(zoxide init zsh)"
 
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
 . "$HOME/.cargo/env"
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
-# Add nvim to path
-export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
