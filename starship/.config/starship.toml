@@ -1,3 +1,9 @@
+continuation_prompt = "[▸▹ ](dimmed white)"
+
+format = """
+$time: $all
+"""
+
 [bun]
 format = "via [$symbol]($style)"
 
@@ -123,3 +129,7 @@ format = 'via [$symbol]($style)'
 
 [gcloud]
 disabled = true
+
+[time]
+disabled = false
+format = "[$time]($style)"
