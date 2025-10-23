@@ -17,9 +17,11 @@ hash -d api=~/dev/osirion/services/api
 hash -d ai=~/dev/osirion/services/ai
 hash -d ftb=~/dev/osirion/services/fn_tournament_bot/
 hash -d fn=~/dev/osirion/services/fn_api/
-hash -d os=~/dev/osirion
 hash -d kinch=~/dev/osirion/apps/kinch-bot
 hash -d ftp=~/dev/osirion/services/fn_tournament_postprocessor
+
+hash -d os=~/dev/osirion
+hash -d ost=~/dev/_temp/osirion
 
 # Command aliases
 alias nvo="nvim ~os"
@@ -28,6 +30,10 @@ alias nvt="nvim ~ +term"
 alias k="kubectl"
 alias kcc="kubectl config current-context"
 
+# Add volta to path
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME:$PATH"
+
 # Add binaries to path
 export PATH="$PATH:$HOME/.local/bin"
 export PATH="$PATH:$HOME/misc/cli_tools/dashlane-cli/bundle"
@@ -35,13 +41,13 @@ export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 export PATH="$PATH:/usr/local/bin/npm"
 export PATH="$PATH:/usr/lib/python3"
-
-# Add volta to path
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME:$PATH"
+export PATH="$PATH:$(npm config get prefix)/bin"
 
 # Add .NET Core SDK tools
 export PATH="$PATH:/home/norlys/.dotnet/tools"
+
+export VISUAL='sh -c "nvr -cc vsplit --remote-wait \"$@\" || nvim \"$@\""' 
+export EDITOR="$VISUAL"
 
 # --------------------------------------------------
 # boilerplate:
