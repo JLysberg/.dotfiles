@@ -25,3 +25,5 @@
 	repo = /home/norlys/dev/osirion
 [core]
   pager = less --tabs 4
+[includeIf "gitdir:~/dev/epic/"]
+  path = ~/.gitconfig.epic
