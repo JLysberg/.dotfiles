@@ -19,16 +19,24 @@ hash -d ftb=~/dev/osirion/services/fn_tournament_bot/
 hash -d fn=~/dev/osirion/services/fn_api/
 hash -d kinch=~/dev/osirion/apps/kinch-bot
 hash -d ftp=~/dev/osirion/services/fn_tournament_postprocessor
+hash -d solver=~/dev/osirion/services/solver
 
 hash -d os=~/dev/osirion
 hash -d ost=~/dev/_temp/osirion
 
-# Command aliases
+# nvim aliases
 alias nvo="nvim ~os"
 alias nvot="nvim ~/dev/_temp/osirion"
 alias nvt="nvim ~ +term"
+
+# kubectl aliases
 alias k="kubectl"
 alias kcc="kubectl config current-context"
+alias kco="kubectl config use-context main-aks"
+alias kce="kubectl config use-context babf-dev-competitive"
+
+# misc aliases
+alias vpnkit="sudo VMEXEC_PATH=$(pwd)/wsl-vm GVPROXY_PATH=$(pwd)/wsl-gvproxy.exe ~/wsl-vpnkit"
 
 # Add volta to path
 export VOLTA_HOME="$HOME/.volta"
