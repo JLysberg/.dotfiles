@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+file=${1:-}
+line=${2:-0}
+
+if [[ -z "$file" ]]; then
+  exit 1
+fi
+
+if [[ "$file" != /* ]]; then
+  file="$PWD/$file"
+fi
+
+if [[ -z "${NVIM:-}" ]]; then
+  if [[ "$line" != "0" && -n "$line" ]]; then
+    exec nvim +"$line" -- "$file"
+  fi
+
+  exec nvim -- "$file"
+fi
+
+file_b64=$(printf '%s' "$file" | base64 | tr -d '\n')
+
+nvim --server "$NVIM" --remote-expr "v:lua.LazygitEditFile('$file_b64', '$line')" >/dev/null

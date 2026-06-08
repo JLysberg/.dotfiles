@@ -2,6 +2,9 @@
   "extras": [
     "lazyvim.plugins.extras.editor.neo-tree",
     "lazyvim.plugins.extras.ui.treesitter-context",
+    "lazyvim.plugins.extras.lang.dotnet",
+    "lazyvim.plugins.extras.lang.typescript",
+    "lazyvim.plugins.extras.lang.svelte"
   ],
   "install_version": 8,
   "news": {
