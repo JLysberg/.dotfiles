@@ -54,6 +54,31 @@ window#waybar {
   margin: 0 7.5px;
 }
 
+#custom-cliamp-visualizer {
+  min-width: 58px;
+  margin-left: 8px;
+  margin-right: 3px;
+  font-size: 5px;
+  opacity: 0.9;
+}
+
+#custom-cliamp-track {
+  min-width: 0;
+  margin-left: 3px;
+  margin-right: 7.5px;
+}
+
+#custom-cliamp-track.paused {
+  opacity: 0.65;
+}
+
+#custom-cliamp-track.unavailable,
+#custom-cliamp-visualizer.unavailable {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
 #tray {
   margin-right: 16px;
 }
