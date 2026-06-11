@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export OMARCHY_PATH="${OMARCHY_PATH:-$HOME/.local/share/omarchy}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export PATH="$HOME/.local/share/omarchy/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:${PATH:-}"
+
+exec "$HOME/.local/share/omarchy/bin/omarchy-hyprland-monitor-watch"
