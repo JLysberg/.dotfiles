@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+case "${1:-}" in
+  light)
+    target_theme="Nord"
+    current_theme_name="nord"
+    ;;
+  dark)
+    target_theme="Hackerman"
+    current_theme_name="hackerman"
+    ;;
+  *)
+    echo "Usage: $0 <light|dark>" >&2
+    exit 64
+    ;;
+esac
+
+export OMARCHY_PATH="${OMARCHY_PATH:-$HOME/.local/share/omarchy}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export PATH="$HOME/.local/share/omarchy/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:$PATH"
+
+start_background() {
+  local background="$HOME/.config/omarchy/current/background"
+  local unit="darkman-swaybg-$(date +%s%N)"
+
+  if [[ ! -e "$background" ]]; then
+    return 0
+  fi
+
+  pkill -x swaybg 2>/dev/null || true
+  systemd-run --user \
+    --unit="$unit" \
+    --description=swaybg \
+    --quiet --collect --same-dir -- \
+    swaybg -i "$background" -m fill >/dev/null 2>&1 || \
+    setsid uwsm-app -- swaybg -i "$background" -m fill >/dev/null 2>&1 &
+}
+
+theme_name_file="$HOME/.config/omarchy/current/theme.name"
+current_theme="$(cat "$theme_name_file" 2>/dev/null || true)"
+
+if [[ "$current_theme" == "$current_theme_name" ]]; then
+  start_background
+  exit 0
+fi
+
+"$HOME/.local/share/omarchy/bin/omarchy" theme set "$target_theme"
+start_background
