@@ -62,7 +62,7 @@
     "escape": true,
     "max-length": 56,
     "tooltip": true,
-    "on-click": "omarchy-launch-or-focus-tui cliamp",
+    "on-click": "cliamp toggle",
     "on-click-right": "$HOME/.config/waybar/scripts/cliamp-spotify-search.sh"
   },
   "custom/update": {
