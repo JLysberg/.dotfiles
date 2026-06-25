@@ -34,15 +34,57 @@ window#waybar {
   background: alpha(@background, 0.7);
 }
 
+#workspaces {
+  margin: 3px 5px;
+  padding: 2px 4px;
+  border-radius: 14px;
+}
+
 #workspaces button {
   all: initial;
-  padding: 0 6px;
+  min-width: 22px;
+  padding: 0 4px;
   margin: 0 1.5px;
-  min-width: 9px;
+  border-radius: 12px;
+  color: @foreground;
+  opacity: 0.72;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+#workspaces button.active {
+  padding: 0 10px;
+  background: alpha(@foreground, 0.2);
+  opacity: 1;
+}
+
+#workspaces button.special {
+  opacity: 0.9;
+}
+
+#workspaces button:hover {
+  background: alpha(@foreground, 0.12);
+  opacity: 1;
+}
+
+#workspaces button.active:hover {
+  background: alpha(@foreground, 0.18);
 }
 
 #workspaces button.empty {
-  opacity: 0.5;
+  opacity: 0.42;
+}
+
+#workspaces button.urgent {
+  background: alpha(@foreground, 0.24);
+  opacity: 1;
+}
+
+#workspaces button label:first-child {
+  margin-right: 8px;
+}
+
+#workspaces button label:last-child {
+  margin-left: 2px;
 }
 
 #cpu,
@@ -58,7 +100,7 @@ window#waybar {
   min-width: 58px;
   margin-left: 8px;
   margin-right: 3px;
-  font-size: 5px;
+  font-size: 7px;
   opacity: 0.9;
 }
 
