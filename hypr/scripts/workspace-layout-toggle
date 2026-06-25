@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ACTIVE_WORKSPACE=$(hyprctl activeworkspace -j | jq -r '.id')
+CURRENT_LAYOUT=$(hyprctl activeworkspace -j | jq -r '.tiledLayout')
+
+case "$CURRENT_LAYOUT" in
+  dwindle)
+    NEW_LAYOUT=scrolling
+    hyprctl keyword workspace "$ACTIVE_WORKSPACE, layout:$NEW_LAYOUT"
+    hyprctl dispatch layoutmsg "colresize 0.8"
+    ;;
+  *)
+    NEW_LAYOUT=dwindle
+    hyprctl keyword workspace "$ACTIVE_WORKSPACE, layout:$NEW_LAYOUT"
+    ;;
+esac
+
+notify-send -u low "Workspace layout set to $NEW_LAYOUT"
