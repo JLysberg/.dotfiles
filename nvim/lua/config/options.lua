@@ -5,3 +5,4 @@ local o = vim.opt
 
 o.relativenumber = true
 o.cursorlineopt = "both"
+o.winborder = "rounded"
