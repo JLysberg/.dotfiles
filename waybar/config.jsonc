@@ -19,7 +19,7 @@
     "format-window-separator": " ",
     "on-click": "activate",
     "persistent-workspaces": {
-      "*": 5
+      "1": []
     },
     "window-rewrite-default": "󰊠",
     "window-rewrite": {
