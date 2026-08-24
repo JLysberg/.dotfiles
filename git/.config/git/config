@@ -1,0 +1,45 @@
+[alias]
+  lg = log --graph --oneline --decorate --all
+  s = status --short
+  cm = commit -m
+  co = checkout
+  d = diff
+  ds = diff --staged
+  dw = diff --word-diff
+  dws = diff --staged --word-diff
+	rs = restore --staged
+	a = add
+[push]
+	autoSetupRemote = true
+[diff]
+	algorithm = histogram    # Clearer diffs on moved/edited lines
+	colorMoved = plain       # Highlight moved blocks in diffs
+	mnemonicPrefix = true    # More intuitive refs in diff output
+[init]
+  defaultBranch = main
+[include]
+  path = ~/.gitconfig.local
+[user]
+  email = jostein.lysberg@gmail.com
+  name = JLysberg
+[rerere]
+	enabled = true
+[column]
+	ui = auto
+[branch]
+	sort = committerdate
+[maintenance]
+  repo = /home/norlys/.dotfiles
+	repo = /home/norlys/dev/osirion
+[core]
+  pager = less --tabs 4
+[includeIf "gitdir:~/dev/epic/"]
+  path = ~/.gitconfig.epic
+[url "git@github.ol.epicgames.net:"]
+	insteadOf = https://github.ol.epicgames.net/
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
