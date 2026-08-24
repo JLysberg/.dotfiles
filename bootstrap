@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+config=${XDG_CONFIG_HOME:-"$HOME/.config"}
+
+if [[ ${1-} == -h || ${1-} == --help ]]; then
+  echo "Usage: ${0##*/} [config ...]"
+  exit
+fi
+
+configs=("$@")
+if ((${#configs[@]} == 0)); then
+  mapfile -t configs < <(find "$repo" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n' | sort)
+fi
+
+conflict=0
+for name in "${configs[@]}"; do
+  if [[ -z $name || $name == .* || $name == */* ]]; then
+    echo "Invalid config name: $name" >&2
+    conflict=1
+    continue
+  fi
+
+  source=$repo/$name
+  target=$config/$name
+
+  if [[ -L $target ]]; then
+    if [[ ! -e $source || $(readlink -f -- "$target") != $(readlink -f -- "$source") ]]; then
+      echo "Conflict: $target is a different symlink" >&2
+      conflict=1
+    fi
+  elif [[ -e $source && -e $target ]] && ! diff -qr --exclude=.git -- "$source" "$target" >/dev/null; then
+    echo "Conflict: $target differs from $source" >&2
+    diff -qr --exclude=.git -- "$source" "$target" >&2 || true
+    conflict=1
+  fi
+done
+((conflict == 0)) || exit 1
+
+backup=${config}.before-dotfiles-$(date +%Y%m%d-%H%M%S)-$$
+mkdir -p -- "$config"
+
+for name in "${configs[@]}"; do
+  source=$repo/$name
+  target=$config/$name
+
+  if [[ -L $target ]]; then
+    echo "Linked: $name"
+  elif [[ ! -e $source && -e $target ]]; then
+    mv -- "$target" "$source"
+    ln -s -- "$(realpath --relative-to="$config" "$source")" "$target"
+    echo "Absorbed: $name"
+  elif [[ -e $source && ! -e $target ]]; then
+    ln -s -- "$(realpath --relative-to="$config" "$source")" "$target"
+    echo "Linked: $name"
+  elif [[ -e $source && -e $target ]]; then
+    mkdir -p -- "$backup"
+    mv -- "$target" "$backup/$name"
+    ln -s -- "$(realpath --relative-to="$config" "$source")" "$target"
+    echo "Linked: $name (backup: $backup/$name)"
+  else
+    echo "Skipped: $name (not found)"
+  fi
+done
