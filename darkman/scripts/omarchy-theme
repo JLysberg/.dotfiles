@@ -21,6 +21,9 @@ export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export PATH="$HOME/.local/share/omarchy/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:$PATH"
 
+theme_name_file="$HOME/.config/omarchy/current/theme.name"
+waybar_off_toggle="$HOME/.local/state/omarchy/toggles/waybar-off"
+
 start_background() {
   local background="$HOME/.config/omarchy/current/background"
   local unit="darkman-swaybg-$(date +%s%N)"
@@ -29,6 +32,9 @@ start_background() {
     return 0
   fi
 
+  # Omarchy's theme command updates this symlink, but swaybg can exit when
+  # started from darkman's user service. Keep the wallpaper in its own transient
+  # user unit so it survives the hook process.
   pkill -x swaybg 2>/dev/null || true
   systemd-run --user \
     --unit="$unit" \
@@ -38,13 +44,35 @@ start_background() {
     setsid uwsm-app -- swaybg -i "$background" -m fill >/dev/null 2>&1 &
 }
 
-theme_name_file="$HOME/.config/omarchy/current/theme.name"
+restore_waybar_visibility() {
+  local unit="darkman-waybar-$(date +%s%N)"
+
+  if [[ -f "$waybar_off_toggle" ]]; then
+    pkill -x waybar 2>/dev/null || true
+  elif ! pgrep -x waybar >/dev/null; then
+    # If Omarchy killed Waybar during the theme switch but could not restart it
+    # from darkman's service environment, start it the same way as the wallpaper.
+    systemd-run --user \
+      --unit="$unit" \
+      --description=waybar \
+      --quiet --collect --same-dir -- \
+      waybar >/dev/null 2>&1 || \
+      setsid uwsm-app -- waybar >/dev/null 2>&1 &
+  fi
+}
+
+apply_theme() {
+  "$HOME/.local/share/omarchy/bin/omarchy" theme set "$target_theme"
+  start_background
+  restore_waybar_visibility
+}
+
 current_theme="$(cat "$theme_name_file" 2>/dev/null || true)"
 
 if [[ "$current_theme" == "$current_theme_name" ]]; then
   start_background
+  restore_waybar_visibility
   exit 0
 fi
 
-"$HOME/.local/share/omarchy/bin/omarchy" theme set "$target_theme"
-start_background
+apply_theme
