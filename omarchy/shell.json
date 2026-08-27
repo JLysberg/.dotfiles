@@ -7,13 +7,13 @@
           "id": "omarchy.indicators"
         },
         {
-          "format": "dddd HH:mm",
+          "id": "omarchy.keyboard-layout"
+        },
+        {
+          "format": "ddd d MMM HH:mm",
           "formatAlt": "d MMMM 'W'ww yyyy",
           "id": "omarchy.clock",
           "verticalFormat": "HH\n—\nmm"
-        },
-        {
-          "id": "omarchy.keyboard-layout"
         },
         {
           "id": "omarchy.weather"
@@ -27,7 +27,16 @@
           "id": "omarchy.menu"
         },
         {
-          "id": "omarchy.workspaces"
+          "id": "io.github.thetrueferret.decent-workspaces"
+        },
+        {
+          "id": "crmne.mpris"
+        },
+        {
+          "id": "itdir.cava",
+          "bars": 64,
+          "color": "gradient",
+          "hideWhenSilent": true
         }
       ],
       "right": [
@@ -55,12 +64,32 @@
       ]
     },
     "position": "top",
-    "transparent": false
+    "transparent": true
   },
   "idle": {
     "lock": 300,
     "screensaver": 150
   },
-  "plugins": [],
-  "version": 1
+  "plugins": [
+    {
+      "id": "io.github.sirjul1337.lock-explorer",
+      "design": "editorial"
+    }
+  ],
+  "version": 1,
+  "disabledPlugins": [
+    "omarchy.lock"
+  ],
+  "cloneSourceRestores": [
+    "io.github.sirjul1337.lock-explorer"
+  ],
+
+
+
+  "_pluginSources": {
+    "crmne.mpris": "https://github.com/crmne/omarchy-mpris.git",
+    "io.github.sirjul1337.lock-explorer": "https://github.com/SirJul1337/omarchy-lock-explorer.git",
+    "io.github.thetrueferret.decent-workspaces": "https://github.com/TheTrueFerret/omarchy-decent-workspaces.git",
+    "itdir.cava": "https://github.com/ltehacker/omarchy-quattro-wave"
+  }
 }

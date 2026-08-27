@@ -1,0 +1,2 @@
+# Omarchy-managed plugin checkouts remain independent Git repositories.
+/omarchy/plugins/
