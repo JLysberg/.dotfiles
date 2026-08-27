@@ -1,0 +1,67 @@
+[[station]]
+name = "Technolovers - PSYTRANCE"
+url = "https://stream.technolovers.fm/psytrance?ref=radiobrowser"
+country = "Germany"
+bitrate = 192
+codec = "MP3"
+tags = "dark psytrance,electronic,progressive psytrance,psytrance,trance"
+homepage = "https://technolovers.fm/"
+
+[[station]]
+name = "techno bunker"
+url = "https://stream.laut.fm/technobunkerfm"
+country = "Germany"
+bitrate = 128
+codec = "MP3"
+tags = "techno"
+homepage = "https://laut.fm/technobunkerfm"
+
+[[station]]
+name = "Best Of Techno"
+url = "http://stream.laut.fm/best-of-techno"
+country = "Germany"
+bitrate = 128
+codec = "MP3"
+tags = "2000er,2000s,classic,deep techno,dub techno,electro,electronic,electronica,minimal,minimal techno,techno"
+homepage = "https://laut.fm/best-of-techno"
+
+[[station]]
+name = "Technolovers HARDCORE"
+url = "https://stream.technolovers.fm/hardcore?ref=radiobrowser"
+country = "Germany"
+bitrate = 192
+codec = "MP3"
+tags = "electronic,electronica,elektro,elektronik,happy hardcore,hardcore,hardstyle,post-hardcore,uptempo hardcore"
+homepage = "https://technolovers.fm/"
+
+[[station]]
+name = "Mabu Beatz Dub Techno"
+url = "http://78.47.31.164:8002/dub"
+country = "Germany"
+bitrate = 128
+codec = "MP3"
+homepage = "https://mabu-beatz-radio.com/"
+
+[[station]]
+name = "TranceBase.FM - AAC HD 256k"
+url = "http://listen.trancebase.fm/tunein-aac-hd-pls"
+country = "Germany"
+bitrate = 256
+codec = "AAC"
+tags = "electronic,techno,trance"
+homepage = "https://www.trancebase.fm/"
+
+[[station]]
+name = "lofi girl"
+url = "https://play.streamafrica.net/lofiradio"
+country = "The United States Of America"
+codec = "MP3"
+homepage = "https://play.streamafrica.net/lofiradio"
+
+[[station]]
+name = "Sunshine LIve - Trance (64kbps)"
+url = "http://stream.sunshine-live.de/trance/aac-64/stream.sunshine-live.de/"
+country = "Germany"
+codec = "AAC"
+tags = "dance,electro,trance"
+homepage = "http://www.sunshine.live.de/"

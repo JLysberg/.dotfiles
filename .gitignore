@@ -1,2 +1,7 @@
 # Omarchy-managed plugin checkouts remain independent Git repositories.
 /omarchy/plugins/
+
+# Cliamp recreates its log and local IPC files at runtime.
+/cliamp/*.log
+/cliamp/*.sock
+/cliamp/*.sock.pid
