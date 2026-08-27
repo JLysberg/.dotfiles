@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-title=$("$HOME/.config/waybar/scripts/cliamp-now-playing.py" --plain 2>/dev/null) || exit 0
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+title=$("$script_dir/cliamp-now-playing.py" --plain 2>/dev/null) || exit 0
 
 query=$(jq -rn --arg q "$title" '$q | @uri')
 spotify_uri="spotify:search:$query"
