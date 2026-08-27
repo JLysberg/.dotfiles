@@ -5,3 +5,10 @@
 /cliamp/*.log
 /cliamp/*.sock
 /cliamp/*.sock.pid
+
+# Herdr keeps logs, IPC sockets, locks, and persisted session state beside its config.
+/herdr/*.log
+/herdr/*.sock
+/herdr/.plugins.lock
+/herdr/session.json
+/herdr/sessions/
