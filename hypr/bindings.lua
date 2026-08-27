@@ -41,7 +41,7 @@ o.bind("SUPER + CTRL + ALT + RETURN", "Tmux (auto-attach)", { omarchy = "termina
 hl.unbind("SUPER + SHIFT + M")
 hl.unbind("SUPER + SHIFT + ALT + M")
 o.bind("SUPER + SHIFT + M", "Music TUI", { tui = "cliamp", focus = true })
-o.bind("SUPER + SHIFT + ALT + M", "Music Search", "~/.dotfiles/waybar/scripts/cliamp-spotify-search.sh")
+o.bind("SUPER + SHIFT + ALT + M", "Music Search", "~/.config/hypr/scripts/cliamp-spotify-search")
 
 hl.unbind("SUPER + SHIFT + D")
 o.bind(

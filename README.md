@@ -12,7 +12,7 @@ single repository and linked into the XDG config directory.
 | `hypr/` | Hyprland, Hypridle, Hyprlock, and related scripts |
 | `nvim/` | Omarchy-adapted LazyVim setup |
 | `tmux/` | tmux bindings and behavior |
-| `waybar/` | Waybar layout, styling, and custom modules |
+| `omarchy/` | Omarchy shell layout, plugins, backgrounds, and hooks |
 
 Each non-hidden top-level directory is treated as a config and mapped directly
 to the same name under `${XDG_CONFIG_HOME:-$HOME/.config}`. Root-level files,
@@ -69,8 +69,4 @@ hyprctl reload
 hyprctl configerrors
 ```
 
-Waybar must be restarted after its configuration changes:
-
-```bash
-omarchy restart waybar
-```
+The Omarchy shell hot-reloads its configuration and user plugins.

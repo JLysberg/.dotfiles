@@ -1,0 +1,264 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly cliamp_pattern='^org\.omarchy\.cliamp$'
+readonly spotify_pattern='spotify'
+readonly beatport_pattern='beatport|www\.beatport\.com'
+readonly lock_file="${XDG_RUNTIME_DIR:-/tmp}/cliamp-spotify-search.lock"
+
+exec 9>"$lock_file"
+flock -n 9 || exit 0
+
+notify_error() {
+  local message="$1"
+  printf 'cliamp-spotify-search: %s\n' "$message" >&2
+  omarchy-notification-send "Music search" "$message" 2>/dev/null || true
+}
+
+now_playing() {
+  local status
+
+  if status=$(timeout 2 omarchy-shell crmne.mpris status 2>/dev/null); then
+    jq -er '
+      select(.available == true)
+      | ((.title // "") | gsub("^\\s+|\\s+$"; "")) as $title
+      | ((.artist // "") | gsub("^\\s+|\\s+$"; "")) as $artist
+      | if $artist == $title then $title else [$title, $artist] | map(select(length > 0)) | join(" ") end
+      | select(length > 0)
+    ' <<<"$status" && return 0
+  fi
+
+  cliamp status --json 2>/dev/null |
+    jq -er '
+      select(.ok == true and .state != "stopped")
+      | .track.title
+      | strings
+      | gsub("^\\s+|\\s+$"; "")
+      | select(length > 0)
+    '
+}
+
+client_address() {
+  local pattern="$1"
+  local match="${2:-any}"
+
+  hyprctl clients -j 2>/dev/null |
+    jq -r --arg pattern "$pattern" --arg match "$match" '
+      first(
+        .[]
+        | select(.mapped == true)
+        | select(
+            if $match == "class" then
+              (.class // "" | test($pattern; "i"))
+            else
+              ((.class // "" | test($pattern; "i")) or (.title // "" | test($pattern; "i")))
+            end
+          )
+        | .address
+      ) // empty
+    '
+}
+
+client_workspace_id() {
+  local address="$1"
+
+  hyprctl clients -j 2>/dev/null |
+    jq -r --arg address "$address" '
+      first(.[] | select(.address == $address) | .workspace.id) // empty
+    '
+}
+
+active_workspace_id() {
+  hyprctl activeworkspace -j 2>/dev/null | jq -er '.id | select(. > 0)'
+}
+
+active_layout() {
+  hyprctl activeworkspace -j 2>/dev/null | jq -er '.tiledLayout'
+}
+
+wait_for_client() {
+  local pattern="$1"
+  local attempts="${2:-50}"
+  local match="${3:-any}"
+  local address
+
+  while ((attempts-- > 0)); do
+    address=$(client_address "$pattern" "$match")
+    if [[ -n $address ]]; then
+      printf '%s\n' "$address"
+      return 0
+    fi
+    sleep 0.1
+  done
+
+  return 1
+}
+
+wait_until_closed() {
+  local address="$1"
+  local attempts=30
+
+  while ((attempts-- > 0)); do
+    if ! hyprctl clients -j 2>/dev/null | jq -e --arg address "$address" '.[] | select(.address == $address)' >/dev/null; then
+      return 0
+    fi
+    sleep 0.1
+  done
+}
+
+hypr_eval() {
+  hyprctl eval "$1" >/dev/null
+}
+
+focus_workspace() {
+  local workspace="$1"
+  [[ $workspace =~ ^[1-9][0-9]*$ ]] || return 1
+  hypr_eval "hl.dispatch(hl.dsp.focus({ workspace = $workspace }))"
+}
+
+focus_window() {
+  local address="$1"
+  [[ $address =~ ^0x[0-9a-fA-F]+$ ]] || return 1
+  hypr_eval "hl.dispatch(hl.dsp.focus({ window = \"address:$address\" }))"
+}
+
+move_to_workspace() {
+  local address="$1"
+  local workspace="$2"
+  [[ $address =~ ^0x[0-9a-fA-F]+$ && $workspace =~ ^[1-9][0-9]*$ ]] || return 1
+  hypr_eval "hl.dispatch(hl.dsp.window.move({ workspace = $workspace, follow = false, window = \"address:$address\" }))"
+}
+
+close_window() {
+  local address="$1"
+  [[ $address =~ ^0x[0-9a-fA-F]+$ ]] || return 1
+  hypr_eval "hl.dispatch(hl.dsp.window.close({ window = \"address:$address\" }))"
+}
+
+layout_message() {
+  local message="$1"
+  [[ $message =~ ^[a-z]+([[:space:]][a-z0-9.+-]+)*$ ]] || return 1
+  hypr_eval "hl.dispatch(hl.dsp.layout(\"$message\"))"
+}
+
+launch_detached() {
+  if command -v setsid >/dev/null 2>&1; then
+    setsid -f "$@" >/dev/null 2>&1
+  else
+    "$@" >/dev/null 2>&1 &
+  fi
+}
+
+open_spotify_search() {
+  local uri="$1"
+
+  if command -v spotify >/dev/null 2>&1; then
+    launch_detached spotify --uri="$uri"
+  elif command -v xdg-open >/dev/null 2>&1; then
+    launch_detached xdg-open "$uri"
+  else
+    return 1
+  fi
+}
+
+window_size() {
+  local address="$1"
+
+  hyprctl clients -j 2>/dev/null |
+    jq -r --arg address "$address" '
+      first(.[] | select(.address == $address) | "\(.size[0]) \(.size[1])") // empty
+    '
+}
+
+resize_window_exact() {
+  local address="$1"
+  local width="$2"
+  local height="$3"
+
+  [[ $address =~ ^0x[0-9a-fA-F]+$ && $width =~ ^[0-9]+$ && $height =~ ^[0-9]+$ ]] || return 1
+  hypr_eval "hl.dispatch(hl.dsp.window.resize({ x = $width, y = $height, relative = false, window = \"address:$address\" }))"
+}
+
+resize_cliamp_for_bottom_row() {
+  local cliamp_address="$1"
+  local bottom_address="$2"
+  local cliamp_size bottom_size width cliamp_height bottom_height total_height target_height
+
+  cliamp_size=$(window_size "$cliamp_address")
+  bottom_size=$(window_size "$bottom_address")
+  [[ -n $cliamp_size && -n $bottom_size ]] || return 0
+
+  read -r width cliamp_height <<<"$cliamp_size"
+  read -r _ bottom_height <<<"$bottom_size"
+  total_height=$((cliamp_height + bottom_height))
+  target_height=$((total_height * 35 / 100))
+  resize_window_exact "$cliamp_address" "$width" "$target_height"
+}
+
+arrange_scrolling_columns() {
+  local address
+
+  for address in "$@"; do
+    [[ -n $address ]] || continue
+    focus_window "$address"
+    layout_message "promote"
+    layout_message "colresize 0.333"
+  done
+  layout_message "fit all"
+}
+
+search_text=$(now_playing) || {
+  notify_error "No current track was reported by MPRIS or Cliamp."
+  exit 1
+}
+
+encoded_query=$(jq -rn --arg query "$search_text" '$query | @uri')
+spotify_uri="spotify:search:$encoded_query"
+beatport_url="https://www.beatport.com/search?q=$encoded_query"
+
+cliamp_address=$(client_address "$cliamp_pattern" class)
+target_workspace=$(client_workspace_id "$cliamp_address")
+target_workspace="${target_workspace:-$(active_workspace_id)}"
+
+focus_workspace "$target_workspace"
+layout=$(active_layout)
+
+if [[ -n $cliamp_address ]]; then
+  focus_window "$cliamp_address"
+  [[ $layout != dwindle ]] || layout_message "preselect d"
+fi
+
+open_spotify_search "$spotify_uri" || {
+  notify_error "Spotify is unavailable."
+  exit 1
+}
+
+spotify_address=$(wait_for_client "$spotify_pattern" 50 || true)
+if [[ -n $spotify_address ]]; then
+  move_to_workspace "$spotify_address" "$target_workspace"
+  focus_window "$spotify_address"
+  [[ $layout != dwindle ]] || layout_message "preselect r"
+fi
+
+beatport_address=$(client_address "$beatport_pattern")
+if [[ -n $beatport_address ]]; then
+  close_window "$beatport_address"
+  wait_until_closed "$beatport_address"
+fi
+
+launch_detached omarchy launch webapp "$beatport_url"
+beatport_address=$(wait_for_client "$beatport_pattern" 80 || true)
+
+if [[ -n $beatport_address ]]; then
+  move_to_workspace "$beatport_address" "$target_workspace"
+  focus_window "$beatport_address"
+fi
+
+if [[ $layout == scrolling ]]; then
+  arrange_scrolling_columns "$cliamp_address" "$spotify_address" "$beatport_address"
+elif [[ -n $cliamp_address && -n $beatport_address ]]; then
+  focus_window "$cliamp_address"
+  resize_cliamp_for_bottom_row "$cliamp_address" "$beatport_address"
+fi
+
+[[ -z $beatport_address ]] || focus_window "$beatport_address"
