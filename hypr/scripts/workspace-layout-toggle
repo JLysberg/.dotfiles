@@ -2,19 +2,26 @@
 
 set -euo pipefail
 
-ACTIVE_WORKSPACE=$(hyprctl activeworkspace -j | jq -r '.id')
-CURRENT_LAYOUT=$(hyprctl activeworkspace -j | jq -r '.tiledLayout')
+current_layout=$(hyprctl activeworkspace -j | jq -r '.tiledLayout')
 
-case "$CURRENT_LAYOUT" in
-  dwindle)
-    NEW_LAYOUT=scrolling
-    hyprctl keyword workspace "$ACTIVE_WORKSPACE, layout:$NEW_LAYOUT"
-    hyprctl dispatch layoutmsg "colresize 0.8"
-    ;;
-  *)
-    NEW_LAYOUT=dwindle
-    hyprctl keyword workspace "$ACTIVE_WORKSPACE, layout:$NEW_LAYOUT"
-    ;;
-esac
+# Keep Quattro's persistent per-workspace layout state and notification.
+omarchy-hyprland-workspace-layout-toggle
 
-notify-send -u low "Workspace layout set to $NEW_LAYOUT"
+# Adjust scrolling-column width
+if [[ $current_layout == dwindle ]]; then
+  for _ in {1..40}; do
+    new_layout=$(hyprctl activeworkspace -j | jq -r '.tiledLayout')
+    [[ $new_layout == scrolling ]] && break
+    sleep 0.05
+  done
+
+  if [[ ${new_layout:-} != scrolling ]]; then
+    echo "Timed out waiting for the scrolling layout" >&2
+    exit 1
+  fi
+
+  # Let Hyprland register the focused window with the new layout before
+  # dispatching colresize; otherwise the command succeeds as a silent no-op.
+  sleep 0.05
+  hyprctl eval 'hl.dispatch(hl.dsp.layout("colresize 0.8"))' >/dev/null
+fi
