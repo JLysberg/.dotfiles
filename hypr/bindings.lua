@@ -38,6 +38,13 @@ o.bind(
 )
 o.bind("SUPER + CTRL + ALT + RETURN", "Tmux (auto-attach)", { omarchy = "terminal-tmux" })
 
+hl.unbind("SUPER + CTRL + RETURN")
+o.bind(
+	"SUPER + CTRL + RETURN",
+	"Herdr: osirion-dev",
+	'uwsm-app -- xdg-terminal-exec --dir="$(omarchy-cmd-terminal-cwd)" -- herdr session attach osirion-dev'
+)
+
 hl.unbind("SUPER + SHIFT + M")
 hl.unbind("SUPER + SHIFT + ALT + M")
 o.bind("SUPER + SHIFT + M", "Music TUI", { tui = "cliamp", focus = true })
