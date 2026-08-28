@@ -28,9 +28,6 @@
 	ui = auto
 [branch]
 	sort = committerdate
-[maintenance]
-  repo = /home/norlys/.dotfiles
-	repo = /home/norlys/dev/osirion
 [core]
   pager = less --tabs 4
 [includeIf "gitdir:~/dev/epic/"]
@@ -39,7 +36,7 @@
 	insteadOf = https://github.ol.epicgames.net/
 [credential "https://github.com"]
 	helper = 
-	helper = !/usr/bin/gh auth git-credential
+	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = 
-	helper = !/usr/bin/gh auth git-credential
+	helper = !gh auth git-credential
