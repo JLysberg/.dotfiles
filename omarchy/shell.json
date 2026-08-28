@@ -83,9 +83,6 @@
   "cloneSourceRestores": [
     "io.github.sirjul1337.lock-explorer"
   ],
-
-
-
   "_pluginSources": {
     "crmne.mpris": "https://github.com/crmne/omarchy-mpris.git",
     "io.github.sirjul1337.lock-explorer": "https://github.com/SirJul1337/omarchy-lock-explorer.git",
