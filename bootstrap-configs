@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+config=${XDG_CONFIG_HOME:-"$HOME/.config"}
+
+if [[ ${1-} == -h || ${1-} == --help ]]; then
+  cat <<EOF
+Usage: ${0##*/} [config ...]
+
+Names map as follows:
+  nvim       -> \$XDG_CONFIG_HOME/nvim
+  foo.toml   -> \$XDG_CONFIG_HOME/foo.toml
+  .zshrc     -> \$HOME/.zshrc
+
+With no arguments, only non-hidden top-level directories are discovered.
+EOF
+  exit
+fi
+
+items=("$@")
+
+if ((${#items[@]} == 0)); then
+  mapfile -t items < <(
+    find "$repo" \
+      -mindepth 1 \
+      -maxdepth 1 \
+      -type d \
+      ! -name '.*' \
+      -printf '%f\n' |
+      sort
+  )
+fi
+
+target_for() {
+  local name=$1
+
+  if [[ -z $name || $name == */* || $name == . || $name == .. ]]; then
+    return 1
+  fi
+
+  if [[ $name == .* ]]; then
+    printf '%s\n' "$HOME/$name"
+  else
+    printf '%s\n' "$config/$name"
+  fi
+}
+
+same_content() {
+  local source=$1
+  local target=$2
+
+  if [[ -d $source && -d $target ]]; then
+    diff -qr --exclude=.git -- "$source" "$target" >/dev/null
+  elif [[ -f $source && -f $target ]]; then
+    cmp -s -- "$source" "$target"
+  else
+    return 1
+  fi
+}
+
+conflict=0
+
+for name in "${items[@]}"; do
+  if ! target=$(target_for "$name"); then
+    echo "Invalid config name: $name" >&2
+    conflict=1
+    continue
+  fi
+
+  source=$repo/$name
+
+  if [[ -L $target ]]; then
+    if [[ ! -e $source ]] ||
+      [[ $(readlink -f -- "$target") != $(readlink -f -- "$source") ]]; then
+      echo "Conflict: $target is a different symlink" >&2
+      conflict=1
+    fi
+  elif [[ -e $source && -e $target ]] &&
+    ! same_content "$source" "$target"; then
+    echo "Conflict: $target differs from $source" >&2
+    conflict=1
+  fi
+done
+
+((conflict == 0)) || exit 1
+
+stamp=$(date +%Y%m%d-%H%M%S)-$$
+config_backup=${config}.before-dotfiles-$stamp
+home_backup=$HOME/.home.before-dotfiles-$stamp
+
+mkdir -p -- "$config"
+
+for name in "${items[@]}"; do
+  target=$(target_for "$name")
+  source=$repo/$name
+  parent=$(dirname -- "$target")
+
+  if [[ $name == .* ]]; then
+    backup=$home_backup
+  else
+    backup=$config_backup
+  fi
+
+  mkdir -p -- "$parent"
+
+  if [[ -L $target ]]; then
+    echo "Linked: $name"
+
+  elif [[ ! -e $source && -e $target ]]; then
+    mv -- "$target" "$source"
+    ln -s -- "$(realpath --relative-to="$parent" "$source")" "$target"
+    echo "Absorbed: $name"
+
+  elif [[ -e $source && ! -e $target ]]; then
+    ln -s -- "$(realpath --relative-to="$parent" "$source")" "$target"
+    echo "Linked: $name"
+
+  elif [[ -e $source && -e $target ]]; then
+    mkdir -p -- "$backup"
+    mv -- "$target" "$backup/$name"
+    ln -s -- "$(realpath --relative-to="$parent" "$source")" "$target"
+    echo "Linked: $name (backup: $backup/$name)"
+
+  else
+    echo "Skipped: $name (not found)"
+  fi
+done
