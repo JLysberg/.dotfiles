@@ -29,6 +29,7 @@ sudo apt install -y \
   lazygit \
   libicu78 \
   ripgrep \
+  starship \
   tmux \
   unzip \
   wl-clipboard \

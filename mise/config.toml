@@ -9,4 +9,3 @@ pnpm = "latest"
 
 # WSL-only because apt nvim is not up to date with latest - instead we use mise
 neovim = "latest"
-starship = "latest"
