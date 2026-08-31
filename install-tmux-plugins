@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+plugin_dir=$HOME/.local/share/tmux/plugins
+tpm_dir=$plugin_dir/tpm
+
+if ! command -v git >/dev/null; then
+  echo "Error: git is required to install TPM." >&2
+  exit 1
+fi
+
+if ! command -v tmux >/dev/null; then
+  echo "Error: tmux is required to install plugins." >&2
+  exit 1
+fi
+
+if [[ ( -e $tpm_dir || -L $tpm_dir ) && ! -d $tpm_dir/.git ]]; then
+  echo "Error: $tpm_dir exists but is not a TPM Git checkout." >&2
+  exit 1
+fi
+
+if [[ ! -d $tpm_dir ]]; then
+  mkdir -p -- "$plugin_dir"
+  git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
+else
+  echo "TPM is already installed at $tpm_dir"
+fi
+
+# TPM's command-line tools read this value from the tmux server. Set it here
+# as well as in tmux.conf so installation also works with an older server.
+tmux start-server \; set-environment -g TMUX_PLUGIN_MANAGER_PATH "$plugin_dir/"
+
+echo "Installing configured tmux plugins"
+"$tpm_dir/bin/install_plugins"

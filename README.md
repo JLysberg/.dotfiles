@@ -5,13 +5,13 @@ single repository and linked into the XDG config directory.
 
 ## Configurations
 
-| Directory | Configuration |
-| --- | --- |
-| `darkman/` | Dark and light theme integration |
-| `git/` | Git defaults, aliases, and credentials |
-| `hypr/` | Hyprland, Hypridle, Hyprlock, and related scripts |
-| `nvim/` | Omarchy-adapted LazyVim setup |
-| `tmux/` | tmux bindings and behavior |
+| Directory  | Configuration                                         |
+| ---------- | ----------------------------------------------------- |
+| `darkman/` | Dark and light theme integration                      |
+| `git/`     | Git defaults, aliases, and credentials                |
+| `hypr/`    | Hyprland, Hypridle, Hyprlock, and related scripts     |
+| `nvim/`    | Omarchy-adapted LazyVim setup                         |
+| `tmux/`    | tmux bindings and behavior                            |
 | `omarchy/` | Omarchy shell layout, plugins, backgrounds, and hooks |
 
 Each non-hidden top-level directory is treated as a config and mapped directly
@@ -45,6 +45,17 @@ each selected config, it will:
 
 Backups are placed beside the XDG config directory and named like
 `.config.before-dotfiles-<timestamp>-<pid>`.
+
+### Tmux pugins
+
+Install TPM and the plugins declared in the tmux config separately:
+
+```bash
+./install-tmux-plugins
+```
+
+TPM stores its plugin checkouts under `~/.local/share/tmux/plugins`, outside
+this repository. Once installed, use `prefix + U` inside tmux to update them.
 
 ### Absorbing a config
 
