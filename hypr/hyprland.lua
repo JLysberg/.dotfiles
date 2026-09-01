@@ -32,3 +32,4 @@ require("default.hypr.toggles")
 
 o.window(".*", { opacity = "0.94 override 0.8 override" })
 o.window("^(brave-browser)$", { opacity = "1 override 0.8 override" })
+o.window("^(net-runelite-client-RuneLite)$", { opacity = "1 override 0.8 override" })
