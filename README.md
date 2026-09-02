@@ -1,7 +1,7 @@
 # Dotfiles
 
-Personal configuration for an Omarchy-based Linux environment, collected in a
-single repository and linked into the XDG config directory.
+Personal configuration shared between Omarchy and WSL Ubuntu systems,
+collected in a single repository and linked into the XDG config directory.
 
 ## Configurations
 
@@ -10,32 +10,56 @@ single repository and linked into the XDG config directory.
 | `darkman/` | Dark and light theme integration                      |
 | `git/`     | Git defaults, aliases, and credentials                |
 | `hypr/`    | Hyprland, Hypridle, Hyprlock, and related scripts     |
+| `mise/`    | Shared tools and the WSL-specific tool profile        |
 | `nvim/`    | Omarchy-adapted LazyVim setup                         |
 | `tmux/`    | tmux bindings and behavior                            |
 | `omarchy/` | Omarchy shell layout, plugins, backgrounds, and hooks |
 
 Each non-hidden top-level directory is treated as a config and mapped directly
-to the same name under `${XDG_CONFIG_HOME:-$HOME/.config}`. Root-level files,
-such as `bootstrap`, are ignored by discovery.
+to the same name under `${XDG_CONFIG_HOME:-$HOME/.config}`. Root-level files
+such as the bootstrap helpers are ignored by discovery.
 
-## Bootstrap
+## Bootstrap helpers
 
-Clone the repository and run the bootstrap script:
+Clone the repository first:
 
 ```bash
 git clone git@github.com:JLysberg/.dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-./bootstrap
 ```
 
-To process only specific configs, pass their names as arguments:
+### Omarchy
+
+Link all non-hidden configuration directories:
 
 ```bash
-./bootstrap nvim tmux
+./bootstrap-configs
 ```
 
-The script performs a complete conflict check before changing anything. For
-each selected config, it will:
+To link only selected configurations, pass their names explicitly:
+
+```bash
+./bootstrap-configs nvim tmux
+```
+
+### WSL Ubuntu
+
+Run the WSL bootstrap to install system packages, link the applicable
+configurations, install mise tools, and select Zsh as the default shell:
+
+```bash
+./bootstrap-wsl
+```
+
+The WSL bootstrap activates the `wsl` mise environment while installing tools.
+Interactive Zsh sessions select the same environment automatically when
+`WSL_DISTRO_NAME` is present. Shared tools live in `mise/config.toml`, while
+WSL-only tools such as Neovim live in `mise/config.wsl.toml`.
+
+### Linking behavior
+
+`bootstrap-configs` performs a complete conflict check before changing
+anything. For each selected config, it will:
 
 - leave an existing correct symlink unchanged;
 - create a relative symlink when the target is missing;
@@ -46,7 +70,7 @@ each selected config, it will:
 Backups are placed beside the XDG config directory and named like
 `.config.before-dotfiles-<timestamp>-<pid>`.
 
-### Tmux pugins
+### Tmux plugins
 
 Install TPM and the plugins declared in the tmux config separately:
 
@@ -63,7 +87,7 @@ A target that exists under `~/.config` but not in the repository can be
 imported by naming it explicitly:
 
 ```bash
-./bootstrap ghostty
+./bootstrap-configs ghostty
 ```
 
 The target is moved into `.dotfiles/ghostty` and replaced with a symlink. The

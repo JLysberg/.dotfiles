@@ -1,5 +1,10 @@
 # mise
 export PATH="$HOME/.local/bin:$PATH"
+
+if [[ -n ${WSL_DISTRO_NAME:-} && ",${MISE_ENV:-}," != *,wsl,* ]]; then
+  export MISE_ENV="wsl${MISE_ENV:+,$MISE_ENV}"
+fi
+
 eval "$(mise activate zsh)"
 
 # History

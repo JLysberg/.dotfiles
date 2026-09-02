@@ -57,7 +57,7 @@ echo "==> Linking dotfiles"
 
 echo "==> Installing mise tools"
 
-"$mise_bin" install
+MISE_ENV=wsl "$mise_bin" install
 
 echo "==> Setting Zsh as the default shell"
 
