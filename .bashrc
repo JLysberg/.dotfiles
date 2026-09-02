@@ -16,3 +16,10 @@ source "$OMARCHY_PATH/default/bash/rc"
 
 # Add your own exports, aliases, and functions here.
 #
+
+# aliases
+alias k='kubectl'
+
+dpass() {
+  dcli password -o console "$@" | wl-copy --trim-newline
+}
