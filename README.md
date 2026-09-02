@@ -81,6 +81,23 @@ Install TPM and the plugins declared in the tmux config separately:
 TPM stores its plugin checkouts under `~/.local/share/tmux/plugins`, outside
 this repository. Once installed, use `prefix + U` inside tmux to update them.
 
+### Tmux projects
+
+The `t` shell alias starts or attaches to a tmux session rooted beneath
+`~/dev`. The session name is derived from the path, so `t osirion` opens
+`~/dev/osirion` in a session named `dev-osirion`. Nested worktrees are also
+supported:
+
+```bash
+t osirion
+t osirion/.worktrees/new-renderer
+```
+
+Run `t` without an argument to select a project or worktree with `fzf`. Inside
+tmux, the same command switches the current client instead of nesting another
+tmux instance. `prefix + C` opens this picker in a popup, while `prefix + S`
+shows the tree of existing sessions and windows.
+
 ### Absorbing a config
 
 A target that exists under `~/.config` but not in the repository can be

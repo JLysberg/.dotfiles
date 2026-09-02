@@ -19,6 +19,7 @@ source "$OMARCHY_PATH/default/bash/rc"
 
 # aliases
 alias k='kubectl'
+alias t="$HOME/.config/tmux/project"
 
 dpass() {
   dcli password -o console "$@" | wl-copy --trim-newline

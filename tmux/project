@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+projects_root=${TMUX_PROJECTS_DIR:-"$HOME/dev"}
+
+if [[ ! -d $projects_root ]]; then
+  printf 'Project directory does not exist: %s\n' "$projects_root" >&2
+  exit 1
+fi
+
+projects_root=$(realpath -e -- "$projects_root")
+
+if (($# == 0)); then
+  project=$(
+    {
+      # Include each direct child, whether or not it is a Git repository.
+      find "$projects_root" \
+        -mindepth 1 \
+        -maxdepth 1 \
+        -type d \
+        -printf '%p\n'
+
+      # Also include nested Git worktrees, such as repo/.worktrees/feature.
+      find "$projects_root" \
+        -mindepth 2 \
+        -maxdepth 5 \
+        \( -type d -o -type f \) \
+        -name .git \
+        -printf '%h\n'
+    } |
+      sort -u |
+      sed "s#^$projects_root/##" |
+      fzf --prompt='tmux project> '
+  ) || exit 0
+elif (($# == 1)); then
+  project=$1
+else
+  printf 'Usage: t [project]\n' >&2
+  exit 2
+fi
+
+if [[ -z $project || $project == /* ]]; then
+  printf 'Project must be a path relative to %s\n' "$projects_root" >&2
+  exit 2
+fi
+
+if ! directory=$(realpath -e -- "$projects_root/$project"); then
+  printf 'Project does not exist: %s/%s\n' "$projects_root" "$project" >&2
+  exit 1
+fi
+
+if [[ ! -d $directory ]]; then
+  printf 'Project is not a directory: %s\n' "$directory" >&2
+  exit 1
+fi
+
+case "$directory/" in
+  "$projects_root"/*) ;;
+  *)
+    printf 'Project must be beneath %s\n' "$projects_root" >&2
+    exit 1
+    ;;
+esac
+
+relative=${directory#"$HOME"/}
+session=$(
+  printf '%s' "$relative" |
+    sed 's#[/:.]#-#g; s#[^[:alnum:]_-]#-#g'
+)
+
+if tmux has-session -t "=$session" 2>/dev/null; then
+  existing_path=$(tmux display-message -p -t "=$session:" '#{session_path}')
+
+  if [[ $existing_path != "$directory" ]]; then
+    printf 'Session %s already belongs to %s\n' "$session" "$existing_path" >&2
+    exit 1
+  fi
+elif [[ -n ${TMUX:-} ]]; then
+  tmux new-session -d -s "$session" -c "$directory"
+else
+  exec tmux new-session -s "$session" -c "$directory"
+fi
+
+if [[ -n ${TMUX:-} ]]; then
+  tmux switch-client -t "=$session"
+else
+  exec tmux attach-session -t "=$session"
+fi
