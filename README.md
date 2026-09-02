@@ -83,20 +83,26 @@ this repository. Once installed, use `prefix + U` inside tmux to update them.
 
 ### Tmux projects
 
-The `t` shell alias starts or attaches to a tmux session rooted beneath
-`~/dev`. The session name is derived from the path, so `t osirion` opens
-`~/dev/osirion` in a session named `dev-osirion`. Nested worktrees are also
-supported:
+The `t` shell alias starts or attaches to a tmux session rooted at a Git
+repository beneath `~`. The session name is derived from its home-relative
+path, so `t osirion` opens `~/dev/osirion` in a session named `dev-osirion`.
+Home-relative paths and nested worktrees are also supported:
 
 ```bash
 t osirion
+t .dotfiles
 t osirion/.worktrees/new-renderer
 ```
 
-Run `t` without an argument to select a project or worktree with `fzf`. Inside
-tmux, the same command switches the current client instead of nesting another
-tmux instance. `prefix + C` opens this picker in a popup, while `prefix + S`
-shows the tree of existing sessions and windows.
+Run `t` without an argument to discover Git repositories and worktrees beneath
+`~` and select one with `fzf`. Discovery includes standalone repositories,
+top-level hidden repositories, and linked Git worktrees. Nested clones and
+repositories beneath hidden tool-storage paths are filtered out. Inside tmux,
+the same command switches the current client instead of nesting another tmux
+instance. `prefix + C` opens this picker in a popup, while `prefix + S` shows
+the tree of existing sessions and windows. The discovered repository list is
+cached under `$XDG_CACHE_HOME/tmux` and refreshed atomically in the background,
+so subsequent picker launches open immediately.
 
 ### Absorbing a config
 
