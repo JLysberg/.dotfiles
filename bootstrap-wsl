@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+mise_bin="$HOME/.local/bin/mise"
+
+if ! grep -qi microsoft /proc/sys/kernel/osrelease; then
+  echo "Error: this bootstrap is intended for WSL." >&2
+  exit 1
+fi
+
+. /etc/os-release
+
+if [[ ${ID:-} != ubuntu ]]; then
+  echo "Error: this bootstrap is intended for Ubuntu." >&2
+  exit 1
+fi
+
+echo "==> Installing Ubuntu packages"
+
+sudo apt update
+sudo apt install -y \
+  build-essential \
+  ca-certificates \
+  curl \
+  fzf \
+  gh \
+  git \
+  lazygit \
+  libicu78 \
+  ripgrep \
+  starship \
+  tmux \
+  unzip \
+  wl-clipboard \
+  xz-utils \
+  zip \
+  zsh \
+  zsh-autosuggestions \
+  zsh-syntax-highlighting
+
+echo "==> Installing mise"
+
+if [[ ! -x $mise_bin ]]; then
+  curl https://mise.run | sh
+fi
+
+echo "==> Linking dotfiles"
+
+"$repo/bootstrap-configs" \
+  git \
+  mise \
+  nvim \
+  tmux \
+  starship.toml \
+  .zshrc
+
+echo "==> Installing mise tools"
+
+"$mise_bin" install
+
+echo "==> Setting Zsh as the default shell"
+
+zsh_bin=$(command -v zsh)
+current_shell=$(getent passwd "$USER" | cut -d: -f7)
+
+if [[ $current_shell != "$zsh_bin" ]]; then
+  sudo chsh -s "$zsh_bin" "$USER"
+fi
+
+echo
+echo "Done."
+echo
+echo "Start Zsh now with:"
+echo
+echo "  exec zsh"
