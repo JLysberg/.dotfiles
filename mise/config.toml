@@ -4,6 +4,7 @@ codex = "latest"
 dotnet = ["latest", "8"]
 java = "latest"
 node = "latest"
+"npm:@xai-official/grok" = "latest"
 opencode = "latest"
 pnpm = "latest"
 
