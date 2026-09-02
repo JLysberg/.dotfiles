@@ -41,8 +41,8 @@ o.bind("SUPER + CTRL + ALT + RETURN", "Tmux (auto-attach)", { omarchy = "termina
 hl.unbind("SUPER + CTRL + RETURN")
 o.bind(
 	"SUPER + CTRL + RETURN",
-	"Herdr: osirion-dev",
-	'uwsm-app -- xdg-terminal-exec --dir="$(omarchy-cmd-terminal-cwd)" -- herdr session attach osirion-dev'
+	"Tmux project",
+	{ tui = (os.getenv("HOME") or "") .. "/.config/tmux/project" }
 )
 
 hl.unbind("SUPER + SHIFT + M")
@@ -57,11 +57,6 @@ o.bind(
 	{ webapp = "https://discord.com/channels/876458732777766922/1010946629521637387", focus = true }
 )
 
-o.bind(
-	"SUPER + ALT + W",
-	"Tmux Work",
-	'uwsm-app -- xdg-terminal-exec --dir="$(omarchy-cmd-terminal-cwd)" bash -c "tmux attach -t work || tmux new -s work"'
-)
 o.bind("SUPER + SHIFT + T", "Monkeytype", { webapp = "https://monkeytype.com", focus = true })
 
 hl.unbind("SUPER + L")
