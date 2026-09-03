@@ -26,3 +26,12 @@ eval "$(starship init zsh)"
 
 # Keep syntax highlighting last so it can wrap ZLE widgets correctly.
 source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+
+
+####
+# aliases and functions
+#
+
+alias k='kubectl'
+alias t="$HOME/.config/tmux/project"
