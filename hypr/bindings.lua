@@ -39,11 +39,7 @@ o.bind(
 o.bind("SUPER + CTRL + ALT + RETURN", "Tmux (auto-attach)", { omarchy = "terminal-tmux" })
 
 hl.unbind("SUPER + CTRL + RETURN")
-o.bind(
-	"SUPER + CTRL + RETURN",
-	"Tmux project",
-	{ tui = (os.getenv("HOME") or "") .. "/.config/tmux/project" }
-)
+o.bind("SUPER + CTRL + RETURN", "Tmux project", { tui = (os.getenv("HOME") or "") .. "/.config/tmux/project" })
 
 hl.unbind("SUPER + SHIFT + M")
 hl.unbind("SUPER + SHIFT + ALT + M")
@@ -58,9 +54,6 @@ o.bind(
 )
 
 o.bind("SUPER + SHIFT + T", "Monkeytype", { webapp = "https://monkeytype.com", focus = true })
-
-hl.unbind("SUPER + L")
-o.bind("SUPER + L", "Toggle workspace layout", "~/.config/hypr/scripts/workspace-layout-toggle")
 
 hl.unbind("SUPER + SHIFT + S")
 o.bind("SUPER + SHIFT + S", "Screenshot", "omarchy-capture-screenshot")

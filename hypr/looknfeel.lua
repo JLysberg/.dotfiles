@@ -61,4 +61,8 @@ hl.config({
 	decoration = {
 		rounding = 5,
 	},
+
+	scrolling = {
+		column_width = 0.9,
+	},
 })
