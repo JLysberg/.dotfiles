@@ -1,6 +1,9 @@
 # Omarchy-managed plugin checkouts remain independent Git repositories.
 /omarchy/plugins/
 
+# Lock Explorer exposes bundled and user-selected media here.
+/omarchy/lock-videos/
+
 # Cliamp recreates its log and local IPC files at runtime.
 /cliamp/*.log
 /cliamp/*.sock

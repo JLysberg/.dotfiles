@@ -73,7 +73,11 @@
   "plugins": [
     {
       "id": "io.github.sirjul1337.lock-explorer",
-      "design": "editorial"
+      "design": "editorial",
+      "keepDisplayOn": true,
+      "unlock": "fade",
+      "unlockMs": 600,
+      "boot": "follow"
     }
   ],
   "version": 1,
