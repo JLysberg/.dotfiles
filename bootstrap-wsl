@@ -4,6 +4,7 @@ set -euo pipefail
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 mise_bin="$HOME/.local/bin/mise"
 epic=false
+docker_group_added=false
 
 usage() {
   cat <<EOF
@@ -54,6 +55,9 @@ sudo apt install -y \
   build-essential \
   ca-certificates \
   curl \
+  docker-buildx \
+  docker-compose-v2 \
+  docker.io \
   fzf \
   gh \
   git \
@@ -70,6 +74,13 @@ sudo apt install -y \
   zsh \
   zsh-autosuggestions \
   zsh-syntax-highlighting
+
+echo "==> Configuring Docker access"
+
+if ! id -nG "$USER" | tr ' ' '\n' | rg -qx docker; then
+  sudo usermod -aG docker "$USER"
+  docker_group_added=true
+fi
 
 echo "==> Installing mise"
 
@@ -124,6 +135,11 @@ fi
 
 echo
 echo "Done."
+if $docker_group_added; then
+  echo
+  echo "Exit this WSL session and start a new one to apply Docker group membership."
+  echo
+fi
 echo
 echo "Start Zsh now with:"
 echo
