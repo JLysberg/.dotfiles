@@ -3,6 +3,37 @@ set -euo pipefail
 
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 mise_bin="$HOME/.local/bin/mise"
+epic=false
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [--epic]
+
+Bootstrap an Ubuntu WSL environment.
+
+  --epic  Link the Twingate-managed Windows kubeconfig into WSL
+  -h, --help
+          Show this help
+EOF
+}
+
+while (($#)); do
+  case $1 in
+  --epic)
+    epic=true
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  *)
+    echo "Error: unknown option: $1" >&2
+    usage >&2
+    exit 2
+    ;;
+  esac
+  shift
+done
 
 if ! grep -qi microsoft /proc/sys/kernel/osrelease; then
   echo "Error: this bootstrap is intended for WSL." >&2
@@ -26,6 +57,7 @@ sudo apt install -y \
   fzf \
   gh \
   git \
+  jq \
   lazygit \
   libicu78 \
   ripgrep \
@@ -58,6 +90,28 @@ echo "==> Linking dotfiles"
 echo "==> Installing mise tools"
 
 MISE_ENV=wsl "$mise_bin" install
+
+if $epic; then
+  echo "==> Linking Twingate-managed kubeconfig"
+
+  if windows_home_win=$(cmd.exe /C 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r') &&
+    windows_home=$(wslpath -u "$windows_home_win") &&
+    [[ -f $windows_home/.kube/config ]]; then
+    windows_kubeconfig=$windows_home/.kube/config
+    wsl_kubeconfig=$HOME/.kube/config
+    mkdir -p "$HOME/.kube"
+
+    if [[ -L $wsl_kubeconfig && $(readlink "$wsl_kubeconfig") == "$windows_kubeconfig" ]]; then
+      echo "Kubeconfig is already linked."
+    elif [[ -e $wsl_kubeconfig || -L $wsl_kubeconfig ]]; then
+      echo "Warning: $wsl_kubeconfig already exists; leaving it unchanged." >&2
+    else
+      ln -s "$windows_kubeconfig" "$wsl_kubeconfig"
+    fi
+  else
+    echo "Warning: no Twingate-managed Windows kubeconfig found; skipping." >&2
+  fi
+fi
 
 echo "==> Setting Zsh as the default shell"
 

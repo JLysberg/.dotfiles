@@ -2,8 +2,11 @@
 claude = "latest"
 codex = "latest"
 dotnet = ["latest", "8"]
+helm = "latest"
 java = "latest"
+kubectl = "latest"
 node = "latest"
 "npm:@xai-official/grok" = "latest"
 opencode = "latest"
 pnpm = "latest"
+terraform = "latest"

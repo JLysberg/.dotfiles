@@ -51,6 +51,13 @@ configurations, install mise tools, and select Zsh as the default shell:
 ./bootstrap-wsl
 ```
 
+On an Epic workstation, opt into linking the kubeconfig managed by Twingate on
+Windows:
+
+```bash
+./bootstrap-wsl --epic
+```
+
 The WSL bootstrap activates the `wsl` mise environment while installing tools.
 Interactive Zsh sessions select the same environment automatically when
 `WSL_DISTRO_NAME` is present. Shared tools live in `mise/config.toml`, while
