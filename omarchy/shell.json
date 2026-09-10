@@ -67,13 +67,18 @@
     "transparent": true
   },
   "idle": {
-    "lock": 300,
-    "screensaver": 150
+    "lock": 600,
+    "screensaver": 180
   },
   "plugins": [
     {
       "id": "io.github.sirjul1337.lock-explorer",
-      "design": "editorial"
+      "design": "editorial",
+      "keepDisplayOn": true,
+      "unlock": "fade",
+      "unlockMs": 600,
+      "boot": "follow",
+      "inputMonitor": "HDMI-A-1"
     }
   ],
   "version": 1,
