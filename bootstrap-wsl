@@ -3,6 +3,38 @@ set -euo pipefail
 
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 mise_bin="$HOME/.local/bin/mise"
+epic=false
+docker_group_added=false
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [--epic]
+
+Bootstrap an Ubuntu WSL environment.
+
+  --epic  Configure Epic kubeconfig and an isolated Codex gateway
+  -h, --help
+          Show this help
+EOF
+}
+
+while (($#)); do
+  case $1 in
+  --epic)
+    epic=true
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  *)
+    echo "Error: unknown option: $1" >&2
+    usage >&2
+    exit 2
+    ;;
+  esac
+  shift
+done
 
 if ! grep -qi microsoft /proc/sys/kernel/osrelease; then
   echo "Error: this bootstrap is intended for WSL." >&2
@@ -23,9 +55,13 @@ sudo apt install -y \
   build-essential \
   ca-certificates \
   curl \
+  docker-buildx \
+  docker-compose-v2 \
+  docker.io \
   fzf \
   gh \
   git \
+  jq \
   lazygit \
   libicu78 \
   ripgrep \
@@ -38,6 +74,13 @@ sudo apt install -y \
   zsh \
   zsh-autosuggestions \
   zsh-syntax-highlighting
+
+echo "==> Configuring Docker access"
+
+if ! id -nG "$USER" | tr ' ' '\n' | rg -qx docker; then
+  sudo usermod -aG docker "$USER"
+  docker_group_added=true
+fi
 
 echo "==> Installing mise"
 
@@ -59,6 +102,52 @@ echo "==> Installing mise tools"
 
 MISE_ENV=wsl "$mise_bin" install
 
+if $epic; then
+  echo "==> Installing Epic Claude Gateway"
+
+  curl -fsSL https://artifacts.ol.epicgames.net/artifactory/ai-gateway/install.sh | bash
+
+  claude_gateway_bin=$(command -v claude-gateway || true)
+  if [[ -z $claude_gateway_bin && -x $HOME/.local/bin/claude-gateway ]]; then
+    claude_gateway_bin=$HOME/.local/bin/claude-gateway
+  fi
+  if [[ -z $claude_gateway_bin ]]; then
+    echo "Error: claude-gateway was not found after installation." >&2
+    exit 1
+  fi
+
+  echo "==> Configuring isolated Epic Codex state"
+
+  epic_codex_home=$HOME/.codex-epic
+  epic_codex_gateway_config=$epic_codex_home/claude-gateway.json
+  install -d -m 700 "$epic_codex_home"
+
+  if [[ ! -f $epic_codex_home/config.toml || ! -f $epic_codex_gateway_config ]]; then
+    CODEX_HOME=$epic_codex_home \
+      CODEX_SQLITE_HOME=$epic_codex_home \
+      CLAUDE_GATEWAY_CODEX_USER_CONFIG_FILE=$epic_codex_gateway_config \
+      "$claude_gateway_bin" codex setup
+  fi
+
+  echo "==> Linking Twingate-managed kubeconfig"
+
+  if windows_home_win=$(cmd.exe /C 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r') &&
+    windows_home=$(wslpath -u "$windows_home_win") &&
+    [[ -f $windows_home/.kube/config ]]; then
+    windows_kubeconfig=$windows_home/.kube/config
+    wsl_kubeconfig=$HOME/.kube/config
+    mkdir -p "$HOME/.kube"
+
+    if [[ -e $wsl_kubeconfig || -L $wsl_kubeconfig ]]; then
+      echo "Warning: $wsl_kubeconfig already exists; leaving it unchanged." >&2
+    else
+      ln -s "$windows_kubeconfig" "$wsl_kubeconfig"
+    fi
+  else
+    echo "Warning: no Twingate-managed Windows kubeconfig found; skipping." >&2
+  fi
+fi
+
 echo "==> Setting Zsh as the default shell"
 
 zsh_bin=$(command -v zsh)
@@ -70,6 +159,11 @@ fi
 
 echo
 echo "Done."
+if $docker_group_added; then
+  echo
+  echo "Exit this WSL session and start a new one to apply Docker group membership."
+  echo
+fi
 echo
 echo "Start Zsh now with:"
 echo

@@ -44,11 +44,24 @@ To link only selected configurations, pass their names explicitly:
 
 ### WSL Ubuntu
 
-Run the WSL bootstrap to install system packages, link the applicable
-configurations, install mise tools, and select Zsh as the default shell:
+Run the WSL bootstrap to install system packages and a native Docker Engine,
+link the applicable configurations, install mise tools, and select Zsh as the
+default shell:
 
 ```bash
 ./bootstrap-wsl
+```
+
+Docker runs directly inside WSL; Docker Desktop and third-party package
+repositories are not used. The bootstrap installs Ubuntu's Engine, Buildx, and
+Compose packages and adds the current user to the `docker` group. Start a new
+WSL session afterward to apply new group membership.
+
+On an Epic workstation, opt into linking the kubeconfig managed by Twingate on
+Windows:
+
+```bash
+./bootstrap-wsl --epic
 ```
 
 The WSL bootstrap activates the `wsl` mise environment while installing tools.
