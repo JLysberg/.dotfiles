@@ -31,7 +31,7 @@
 [core]
   pager = less --tabs 4
 [includeIf "gitdir:~/dev/epic/"]
-  path = ~/.gitconfig.epic
+  path = config.epic
 [url "git@github.ol.epicgames.net:"]
 	insteadOf = https://github.ol.epicgames.net/
 [credential "https://github.com"]
@@ -42,4 +42,4 @@
 	helper = !gh auth git-credential
 [credential "https://live.roost.on.epicgames.com"]
 	helper = 
-	helper = /home/norlys/.local/bin/claude-gateway credential-helper
+	helper = "!\"$HOME/.local/bin/claude-gateway\" credential-helper"
