@@ -1,0 +1,39 @@
+# The current version of the config schema
+version: 1
+# What protocol to use when performing git operations. Supported values: ssh, https
+git_protocol: ssh
+# What editor gh should run when creating issues, pull requests, etc. If blank, will refer to environment.
+editor:
+# When to interactively prompt. This is a global config that cannot be overridden by hostname. Supported values: enabled, disabled
+prompt: enabled
+# A pager program to send command output to, e.g. "less". If blank, will refer to environment. Set the value to "cat" to disable the pager.
+pager:
+# Aliases allow you to create nicknames for gh commands
+aliases:
+    ic: issue create -a @me -p dev
+    dev: |-
+        !f() {
+          if [ -z "$1" ]; then
+              echo "Usage: gh dev <issue-number> [base-branch]" >&2
+              return 1
+          fi
+
+          num="$1"
+          base="$2"
+
+          branch=$(gh issue develop --list "$num" | cut -f1 | head -n1)
+          if [ -n "$branch" ]; then
+              git checkout "$branch"
+          else
+              if [ -n "$base" ]; then
+                  gh issue develop "$num" --name "feat/dev-$num" --base "$base" --checkout
+              else
+                  gh issue develop "$num" --name "feat/dev-$num" --checkout
+              fi
+          fi
+        }; f "$@"
+
+# The path to a unix socket through which send HTTP connections. If blank, HTTP traffic will be handled by net/http.DefaultTransport.
+http_unix_socket:
+# What web browser gh should use when opening URLs. If blank, will refer to environment.
+browser:

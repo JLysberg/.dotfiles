@@ -15,3 +15,6 @@
 /herdr/.plugins.lock
 /herdr/session.json
 /herdr/sessions/
+
+# Git hosts
+/gh/hosts.yml
