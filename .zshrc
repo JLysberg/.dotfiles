@@ -41,6 +41,11 @@ _codex_is_epic_workspace() {
 # SQLite-backed state in separate Codex homes. `env` launches the external
 # binary rather than recursively calling this function.
 codex() {
+  # Pane hooks need a backend that inherits this tmux pane's environment.
+  if [[ -n ${TMUX:-} ]] && (( ${argv[(Ie)--no-daemon]} == 0 )); then
+    set -- --no-daemon "$@"
+  fi
+
   if _codex_is_epic_workspace; then
     if [[ ! -f $HOME/.codex-epic/config.toml || ! -f $HOME/.codex-epic/claude-gateway.json ]]; then
       print -u2 "Epic Codex is not configured. Run: epic_codex_gateway setup"
@@ -70,3 +75,6 @@ codex() {
 
 alias k='kubectl'
 alias t="$HOME/.config/tmux/project"
+
+# Load local AKS credentials alongside the Twingate-managed kubeconfig.
+export KUBECONFIG="$HOME/.kube/osirion.yaml:$HOME/.kube/config"
