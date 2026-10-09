@@ -4,15 +4,18 @@ set -euo pipefail
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 mise_bin="$HOME/.local/bin/mise"
 epic=false
+link_dotfiles=false
 docker_group_added=false
 
 usage() {
   cat <<EOF
-Usage: $(basename "$0") [--epic]
+Usage: $(basename "$0") [--epic] [--link-dotfiles]
 
 Bootstrap an Ubuntu WSL environment.
 
   --epic  Configure Epic kubeconfig and an isolated Codex gateway
+  --link-dotfiles
+          Link the applicable dotfiles into the home and XDG config directories
   -h, --help
           Show this help
 EOF
@@ -22,6 +25,9 @@ while (($#)); do
   case $1 in
   --epic)
     epic=true
+    ;;
+  --link-dotfiles)
+    link_dotfiles=true
     ;;
   -h | --help)
     usage
@@ -88,15 +94,17 @@ if [[ ! -x $mise_bin ]]; then
   curl https://mise.run | sh
 fi
 
-echo "==> Linking dotfiles"
+if $link_dotfiles; then
+  echo "==> Linking dotfiles"
 
-"$repo/bootstrap-configs" \
-  git \
-  mise \
-  nvim \
-  tmux \
-  starship.toml \
-  .zshrc
+  "$repo/bootstrap-configs" \
+    git \
+    mise \
+    nvim \
+    tmux \
+    starship.toml \
+    .zshrc
+fi
 
 echo "==> Installing mise tools"
 

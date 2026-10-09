@@ -45,11 +45,17 @@ To link only selected configurations, pass their names explicitly:
 ### WSL Ubuntu
 
 Run the WSL bootstrap to install system packages and a native Docker Engine,
-link the applicable configurations, install mise tools, and select Zsh as the
-default shell:
+install mise tools, prepare an isolated Claude profile, and select Zsh as the
+default shell. Dotfile linking is opt-in:
 
 ```bash
 ./bootstrap-wsl
+```
+
+To also link the applicable configurations, pass `--link-dotfiles`:
+
+```bash
+./bootstrap-wsl --link-dotfiles
 ```
 
 Docker runs directly inside WSL; Docker Desktop and third-party package
@@ -61,10 +67,11 @@ On an Epic workstation, opt into linking the kubeconfig managed by Twingate on
 Windows:
 
 ```bash
-./bootstrap-wsl --epic
+./bootstrap-wsl --epic --link-dotfiles
 ```
 
-The WSL bootstrap activates the `wsl` mise environment while installing tools.
+The WSL bootstrap installs tools directly from this repository's `mise/`
+configuration with the `wsl` environment, even when dotfile linking is skipped.
 Interactive Zsh sessions select the same environment automatically when
 `WSL_DISTRO_NAME` is present. Shared tools live in `mise/config.toml`, while
 WSL-only tools such as Neovim live in `mise/config.wsl.toml`.
