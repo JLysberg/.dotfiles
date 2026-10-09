@@ -45,7 +45,7 @@ To link only selected configurations, pass their names explicitly:
 ### WSL Ubuntu
 
 Run the WSL bootstrap to install system packages and a native Docker Engine,
-install mise tools, prepare an isolated Claude profile, and select Zsh as the
+install mise tools, prepare separate Claude and Codex profiles, and select Zsh as the
 default shell. Dotfile linking is opt-in:
 
 ```bash
@@ -63,8 +63,8 @@ repositories are not used. The bootstrap installs Ubuntu's Engine, Buildx, and
 Compose packages and adds the current user to the `docker` group. Start a new
 WSL session afterward to apply new group membership.
 
-On an Epic workstation, opt into linking the kubeconfig managed by Twingate on
-Windows:
+On an Epic workstation, prepare the isolated Epic AI profiles and link the
+kubeconfig managed by Twingate on Windows:
 
 ```bash
 ./bootstrap-wsl --epic --link-dotfiles
@@ -75,6 +75,47 @@ configuration with the `wsl` environment, even when dotfile linking is skipped.
 Interactive Zsh sessions select the same environment automatically when
 `WSL_DISTRO_NAME` is present. Shared tools live in `mise/config.toml`, while
 WSL-only tools such as Neovim live in `mise/config.wsl.toml`.
+
+### Claude and Codex profiles
+
+`claude` and `codex` use the general profiles (`~/.claude` and `~/.codex`)
+outside `~/dev/epic`. Within that directory and its subdirectories, they call
+`claude-epic` and `codex-epic`, which use `~/.claude-epic` and `~/.codex-epic`.
+The explicit Epic commands work from any directory. These shell functions
+are available after linking `.zshrc` and starting a new Zsh session.
+
+Bootstrap prepares the profiles without requiring Epic SSO. For general
+work, sign in normally outside `~/dev/epic`:
+
+```bash
+claude auth login
+codex login
+```
+
+With `--epic`, bootstrap also installs a separate setup command:
+
+```bash
+epic-ai-setup
+```
+
+Run it when ready to install and configure the Epic gateway. Both the gateway
+installer and Claude/Codex setup receive the Epic profile paths, including the
+separate Codex gateway config and token storage. This step may request Epic
+SSO; it is independent of general authentication. Re-running it skips profiles
+that already have their gateway configuration.
+
+`bootstrap-ai-configs` can also prepare or migrate profiles independently:
+
+```bash
+./bootstrap-ai-configs --epic
+```
+
+It moves a gateway-owned legacy `~/.claude` to `~/.claude-epic` and renames
+`~/.claude-osirion` to `~/.claude`. If present, legacy `~/.codex-osirion` moves
+to `~/.codex-epic`. Existing sessions and credentials are preserved; affected
+Claude settings and plugin registry paths are updated with backups. Conflicting
+source and destination profiles stop migration rather than merge accounts.
+Run migration with the AI tools closed.
 
 ### Linking behavior
 

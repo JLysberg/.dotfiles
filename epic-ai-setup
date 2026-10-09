@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if (($#)); then
+  echo "Usage: ${0##*/}" >&2
+  exit 2
+fi
+
+export PATH="$HOME/.local/bin:$PATH"
+
+# Mise-managed Claude must be visible to the gateway's dependency check.
+if [[ -x $HOME/.local/bin/mise ]]; then
+  mise_env=$("$HOME/.local/bin/mise" env -s bash claude@latest codex@latest)
+  eval "$mise_env"
+fi
+
+# Scope installation, setup, gateway hooks, and token caches to Epic profiles.
+export CLAUDE_CONFIG_DIR="$HOME/.claude-epic"
+export CLAUDE_GATEWAY_USER_CONFIG_FILE="$CLAUDE_CONFIG_DIR/gateway-helper-config.json"
+export CODEX_HOME="$HOME/.codex-epic"
+export CODEX_SQLITE_HOME="$CODEX_HOME"
+export CLAUDE_GATEWAY_CODEX_USER_CONFIG_FILE="$CODEX_HOME/claude-gateway.json"
+unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN ANTHROPIC_BASE_URL ANTHROPIC_CUSTOM_HEADERS ANTHROPIC_PROFILE
+unset CLAUDE_CODE_OAUTH_TOKEN CLAUDE_CODE_OAUTH_REFRESH_TOKEN CLAUDE_CODE_OAUTH_SCOPES
+unset CLAUDE_CODE_USE_BEDROCK CLAUDE_CODE_USE_VERTEX CLAUDE_CODE_USE_FOUNDRY
+unset OPENAI_API_KEY CODEX_API_KEY CODEX_ACCESS_TOKEN CLAUDE_GATEWAY_CONFIG_OVERRIDES
+install -d -m 700 "$CLAUDE_CONFIG_DIR" "$CODEX_HOME"
+
+gateway_bin=$(command -v claude-gateway || true)
+if [[ -z $gateway_bin ]]; then
+  echo "==> Installing Epic Claude Gateway (may request Epic SSO)"
+  curl -fsSL https://artifacts.ol.epicgames.net/artifactory/ai-gateway/install.sh | bash
+  gateway_bin=$(command -v claude-gateway || true)
+fi
+if [[ -z $gateway_bin ]]; then
+  echo "Error: claude-gateway was not found after installation." >&2
+  exit 1
+fi
+
+if [[ ! -f $CLAUDE_CONFIG_DIR/settings.json || ! -f $CLAUDE_GATEWAY_USER_CONFIG_FILE ]]; then
+  echo "==> Configuring isolated Epic Claude state"
+  "$gateway_bin" run
+fi
+if [[ ! -f $CODEX_HOME/config.toml || ! -f $CLAUDE_GATEWAY_CODEX_USER_CONFIG_FILE ]]; then
+  echo "==> Configuring isolated Epic Codex state"
+  "$gateway_bin" codex setup
+fi
+
+echo "Epic profiles ready. Use claude-epic or codex-epic, or run claude/codex under ~/dev/epic."

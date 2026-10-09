@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Prepare profiles without installing the gateway or authenticating either tool.
+epic=false
+case ${1:-} in
+  --epic) epic=true ;;
+  '') ;;
+  *) echo "Usage: ${0##*/} [--epic]" >&2; exit 2 ;;
+esac
+(($# <= 1)) || { echo "Usage: ${0##*/} [--epic]" >&2; exit 2; }
+
+has_path() { [[ -e $1 || -L $1 ]]; }
+conflict() {
+  echo "Error: both $1 and $2 exist; resolve the profile migration before retrying." >&2
+  exit 1
+}
+
+# Only relocate the default Claude profile when it is recognizably gateway-owned.
+# A personal default profile must stay personal, even on an Epic workstation.
+legacy_epic=false
+if [[ -f $HOME/.claude/gateway-helper-config.json ]] ||
+  { [[ -f $HOME/.claude/settings.json ]] && grep -q 'claude-gateway' "$HOME/.claude/settings.json"; }; then
+  legacy_epic=true
+fi
+
+# Check every destination before moving any profile. Never merge credentials.
+if $legacy_epic && has_path "$HOME/.claude-epic"; then
+  conflict "$HOME/.claude" "$HOME/.claude-epic"
+fi
+if has_path "$HOME/.claude-osirion" && has_path "$HOME/.claude" && ! $legacy_epic; then
+  conflict "$HOME/.claude-osirion" "$HOME/.claude"
+fi
+if has_path "$HOME/.codex-osirion" && has_path "$HOME/.codex-epic"; then
+  conflict "$HOME/.codex-osirion" "$HOME/.codex-epic"
+fi
+
+claude_json_files=(settings.json settings.local.json gateway-helper-config.json
+  .claude.json plugins/installed_plugins.json plugins/known_marketplaces.json)
+# Parse files before moving directories so malformed JSON cannot strand a migration.
+for profile in "$HOME/.claude-osirion"; do
+  for file in "${claude_json_files[@]}"; do
+    [[ ! -f $profile/$file ]] || jq empty "$profile/$file"
+  done
+done
+if $legacy_epic; then
+  for file in "${claude_json_files[@]}"; do
+    [[ ! -f $HOME/.claude/$file ]] || jq empty "$HOME/.claude/$file"
+  done
+  [[ ! -f $HOME/.claude.json ]] || jq empty "$HOME/.claude.json"
+  if has_path "$HOME/.claude/.claude.json.legacy-default" && has_path "$HOME/.claude.json"; then
+    conflict "$HOME/.claude/.claude.json.legacy-default" "$HOME/.claude.json"
+  fi
+fi
+
+# Update embedded paths in settings and plugin registries after a directory move.
+# Backups retain the original JSON; transcripts and credentials are left intact.
+rewrite_paths() {
+  local old=$1 new=$2 file tmp
+  for file in "${claude_json_files[@]}"; do
+    [[ -f $new/$file ]] || continue
+    tmp=$(mktemp "$new/.profile-migration.XXXXXX")
+    if ! jq --arg old "$old" --arg new "$new" \
+      --arg old_tilde "~/${old##*/}" --arg new_tilde "~/${new##*/}" \
+      'def relocate:
+         if . == $old then $new elif . == $old_tilde then $new_tilde
+         else split($old + "/") | join($new + "/") |
+              split($old_tilde + "/") | join($new_tilde + "/") end;
+       walk(if type == "string" then relocate
+            elif type == "object" then with_entries(.key |= relocate)
+            else . end)' \
+      "$new/$file" > "$tmp"; then
+      rm -f -- "$tmp"
+      echo "Error: cannot update paths in $new/$file; original file retained." >&2
+      return 1
+    fi
+    if ! cmp -s -- "$new/$file" "$tmp"; then
+      cp -p -- "$new/$file" "$new/$file.before-profile-rename"
+      chmod --reference="$new/$file" "$tmp"
+      mv -- "$tmp" "$new/$file"
+    else
+      rm -f -- "$tmp"
+    fi
+  done
+}
+
+if $legacy_epic; then
+  echo "==> Migrating Epic Claude state to ~/.claude-epic"
+  mv -- "$HOME/.claude" "$HOME/.claude-epic"
+  # With CLAUDE_CONFIG_DIR set, Claude reads this sidecar inside the profile.
+  if [[ -f $HOME/.claude.json ]]; then
+    if [[ ! -e $HOME/.claude-epic/.claude.json ]]; then
+      mv -- "$HOME/.claude.json" "$HOME/.claude-epic/.claude.json"
+    else
+      mv -- "$HOME/.claude.json" "$HOME/.claude-epic/.claude.json.legacy-default"
+    fi
+  fi
+  rewrite_paths "$HOME/.claude" "$HOME/.claude-epic"
+fi
+
+if has_path "$HOME/.claude-osirion"; then
+  echo "==> Migrating general Claude state to ~/.claude"
+  mv -- "$HOME/.claude-osirion" "$HOME/.claude"
+  rewrite_paths "$HOME/.claude-osirion" "$HOME/.claude"
+fi
+
+if has_path "$HOME/.codex-osirion"; then
+  echo "==> Migrating Epic Codex state to ~/.codex-epic"
+  mv -- "$HOME/.codex-osirion" "$HOME/.codex-epic"
+fi
+
+install -d -m 700 "$HOME/.claude" "$HOME/.codex"
+# Preserve an existing personal default sidecar when switching to an explicit home.
+if ! $legacy_epic && [[ -f $HOME/.claude.json && ! -e $HOME/.claude/.claude.json ]]; then
+  cp -p -- "$HOME/.claude.json" "$HOME/.claude/.claude.json"
+fi
+if $epic; then
+  install -d -m 700 "$HOME/.claude-epic" "$HOME/.codex-epic"
+fi

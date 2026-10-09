@@ -13,7 +13,7 @@ Usage: $(basename "$0") [--epic] [--link-dotfiles]
 
 Bootstrap an Ubuntu WSL environment.
 
-  --epic  Configure Epic kubeconfig and an isolated Codex gateway
+  --epic  Prepare isolated Epic AI profiles and link the Epic kubeconfig
   --link-dotfiles
           Link the applicable dotfiles into the home and XDG config directories
   -h, --help
@@ -108,35 +108,19 @@ fi
 
 echo "==> Installing mise tools"
 
-MISE_ENV=wsl "$mise_bin" install
+MISE_CONFIG_DIR="$repo/mise" MISE_ENV=wsl "$mise_bin" install
+
+echo "==> Preparing isolated AI profiles"
 
 if $epic; then
-  echo "==> Installing Epic Claude Gateway"
+  "$repo/bootstrap-ai-configs" --epic
+  install -d "$HOME/.local/bin"
+  install -m 755 "$repo/epic-ai-setup" "$HOME/.local/bin/epic-ai-setup"
+else
+  "$repo/bootstrap-ai-configs"
+fi
 
-  curl -fsSL https://artifacts.ol.epicgames.net/artifactory/ai-gateway/install.sh | bash
-
-  claude_gateway_bin=$(command -v claude-gateway || true)
-  if [[ -z $claude_gateway_bin && -x $HOME/.local/bin/claude-gateway ]]; then
-    claude_gateway_bin=$HOME/.local/bin/claude-gateway
-  fi
-  if [[ -z $claude_gateway_bin ]]; then
-    echo "Error: claude-gateway was not found after installation." >&2
-    exit 1
-  fi
-
-  echo "==> Configuring isolated Epic Codex state"
-
-  epic_codex_home=$HOME/.codex-epic
-  epic_codex_gateway_config=$epic_codex_home/claude-gateway.json
-  install -d -m 700 "$epic_codex_home"
-
-  if [[ ! -f $epic_codex_home/config.toml || ! -f $epic_codex_gateway_config ]]; then
-    CODEX_HOME=$epic_codex_home \
-      CODEX_SQLITE_HOME=$epic_codex_home \
-      CLAUDE_GATEWAY_CODEX_USER_CONFIG_FILE=$epic_codex_gateway_config \
-      "$claude_gateway_bin" codex setup
-  fi
-
+if $epic; then
   echo "==> Linking Twingate-managed kubeconfig"
 
   if windows_home_win=$(cmd.exe /C 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r') &&
@@ -176,3 +160,9 @@ echo
 echo "Start Zsh now with:"
 echo
 echo "  exec zsh"
+
+echo
+echo "General AI tools are ready; sign in normally with claude auth login and codex login outside ~/dev/epic."
+if $epic; then
+  echo "When ready to configure Epic Claude and Codex, run: epic-ai-setup"
+fi
