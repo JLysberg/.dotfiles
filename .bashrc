@@ -18,6 +18,9 @@ source "$OMARCHY_PATH/default/bash/rc"
 #
 
 # aliases
+# Codex's shared daemon inherits one TMUX_PANE, causing tmux-agent-sidebar
+# states from different panes to overwrite each other. Keep each launch local.
+alias codex='codex --no-daemon'
 alias k='kubectl'
 alias t="$HOME/.config/tmux/project"
 
