@@ -77,8 +77,9 @@
       "keepDisplayOn": true,
       "unlock": "fade",
       "unlockMs": 600,
-      "boot": "follow",
-      "inputMonitor": "HDMI-A-1"
+      "boot": "terminal",
+      "inputMonitor": "HDMI-A-1",
+      "bootResync": false
     }
   ],
   "version": 1,
