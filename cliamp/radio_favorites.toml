@@ -65,3 +65,12 @@ country = "Germany"
 codec = "AAC"
 tags = "dance,electro,trance"
 homepage = "http://www.sunshine.live.de/"
+
+[[station]]
+name = "1.FM - Deep Techno & Deep House"
+url = "http://strm112.1.fm/deeptech_mobile_mp3"
+country = "Switzerland"
+bitrate = 256
+codec = "MP3"
+tags = "deep house,techno"
+homepage = "http://www.1.fm/"
