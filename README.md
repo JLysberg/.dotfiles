@@ -180,6 +180,30 @@ committed.
 
 ## Applying desktop changes
 
+Monitor layouts live in `hypr/monitor_profiles/`. `hypr/monitors.lua` loads the
+home layout by default: portrait left (1–5), landscape right (6–10).
+It then loads `hypr/monitors.local.lua` if present. This file is gitignored,
+so each desk can override the layout without changing the shared default.
+
+For the stacked desk, put this in `hypr/monitors.local.lua`:
+
+```lua
+require("hypr.monitor_profiles.stacked")  -- HDMI above (1–5), USB-C below (6–10)
+```
+
+Remove or rename `monitors.local.lua` to return to the home layout, then
+reload Hyprland. The stacked layout centers the USB-C ASUS
+(`DP-1`) beneath the HDMI Samsung (`HDMI-A-2`), with both in landscape.
+To experiment with scaling,
+edit `upper_scale` (HDMI) and `lower_scale` (USB-C) at the top of
+`hypr/monitor_profiles/stacked.lua`. Positions recalculate automatically to keep
+the displays centered and touching. Higher scales make the UI larger. Values
+of `1`, `1.25`, `1.6`, and `2` divide both resolutions cleanly; `1.5` also works
+for HDMI, but not USB-C at 2560×1600. Reload and check configuration errors after
+each change. The home profile provides the same scale controls through
+`left_scale` and `right_scale`, positioning the landscape display directly
+to the right of the portrait display with their top edges aligned.
+
 Hyprland normally reloads configuration automatically, but it can be validated
 explicitly after a migration or update:
 
